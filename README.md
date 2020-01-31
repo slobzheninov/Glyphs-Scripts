@@ -1,4 +1,4 @@
-## Scripts for Glyphs
+## About
 
 These are scripts for [Glyphs](https://glyphsapp.com/).
 
