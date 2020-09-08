@@ -1,4 +1,4 @@
-#MenuTitle: Mirror Kerning
+#MenuTitle: Mirror Kerning (WIP)
 # -*- coding: utf-8 -*-
 __doc__="""
 Mirrors kerning for groups marked with | symbol
