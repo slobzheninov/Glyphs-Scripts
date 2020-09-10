@@ -21,4 +21,4 @@ Using:
 Add a bar symbol (|) to both left and right kerning group names if you want them to mirror. For example @|A or @|V. Kern one side (AV), run the script and get the other side kerned (VA). If both sides already have different kerning values, it’ll open a new tab for you to check. The script igonres uppercase to lowercase mirroring. Don’t forget to put asymmetric glyphs like “b” to apropriate mirroring groups as well!
 
 ### Preferred Names
-Sets (or cleans) *preferredFamily* and *preferredSubfamily* instance custom parameters (based on *Font Family Name* and *Instance / Style Name*)
+Sets (or cleans) *preferredFamily* and *preferredSubfamily* instance custom parameters. Based on *Font Family Name* and *Instance / Style Name*
