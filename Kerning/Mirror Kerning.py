@@ -87,7 +87,7 @@ for leftGlyphID in thisKernDict.keys():
 			
 				#kern if the mirrored pair doesn't exist
 				if  thisFont.kerningForPair(thisMasterID, mirroredLeftGroup, mirroredRightGroup) > 1000000:
-					thisFont.setKerningForPair(thisMasterID, mirroredLeftGroup, mirroredRightGroup, kerningValue) # this seems to crash Glyphs sometimes!
+					thisFont.setKerningForPair(thisMasterID, mirroredLeftGroup, mirroredRightGroup, kerningValue) # !!! This seems to crash Glyphs sometimes!!!
 					#print(shortMirLeft, kerningValue, shortMirRight, "was created")
 					macroText += "@%s @%s: %s\n" % (shortMirLeft, shortMirRight, kerningValue)
 					#print (macroText)
