@@ -14,6 +14,7 @@ The idea of these scripts is to align and reflect nodes and handles with keyboar
 
 ### Mirror Kerning
 Mirrors kerning for symmetrical things like AVA or OVO, etc. You control what to mirror.
+
 *Save or create a backup copy before using! It might crash Glyphs.*
 
 Using:
