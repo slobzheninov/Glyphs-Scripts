@@ -22,3 +22,6 @@ Add a bar symbol (|) to both left and right kerning group names if you want them
 
 ### Preferred Names
 Sets (or cleans) *preferredFamily* and *preferredSubfamily* instance custom parameters. Based on *Font Family Name* and *Instance / Style Name*. Useful for office apps compatibility.
+
+### Dark Mode
+Toggles dark mode on and off.
