@@ -8,7 +8,7 @@ Put the scripts into Scripts folder: Library – Application Support - Glyphs - 
 
 ### Align and Reflect
 
-The idea of these scripts is to align and reflect nodes and handles with keyboard shortcuts and save a lot of time. I personally use Ctrl + Cmd + Arrow keys. Set it in System Preferences – Keyboard – Shortcuts.
+Align and reflect nodes and handles. Useful with keyboard shortcuts — I personally use Ctrl + Cmd + Arrow keys. Set it in System Preferences – Keyboard – Shortcuts.
 
 ### Mirror Kerning
 Mirrors kerning for symmetrical things like AVA or OVO, etc. You control what to mirror.
