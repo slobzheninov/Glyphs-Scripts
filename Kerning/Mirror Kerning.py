@@ -13,6 +13,7 @@ tabText = "Not equal kerning:\n"
 openNewTab = False
 macroText = "Kerning mirrored:\n"
 openMacro = False
+counter = 0
 
  
 # ------------------------------------ Collect mirroring groups ---------------------------
@@ -87,10 +88,11 @@ for leftGlyphID in thisKernDict.keys():
 			
 				#kern if the mirrored pair doesn't exist
 				if  thisFont.kerningForPair(thisMasterID, mirroredLeftGroup, mirroredRightGroup) > 1000000:
-					thisFont.setKerningForPair(thisMasterID, mirroredLeftGroup, mirroredRightGroup, kerningValue) # !!! This seems to crash Glyphs sometimes!!!
+					thisFont.setKerningForPair(thisMasterID, mirroredLeftGroup, mirroredRightGroup, kerningValue) # this seems to crash Glyphs sometimes!
 					#print(shortMirLeft, kerningValue, shortMirRight, "was created")
 					macroText += "@%s @%s: %s\n" % (shortMirLeft, shortMirRight, kerningValue)
 					#print (macroText)
+					counter += 1
 					openMacro = True
 					
 				# if the mirrored pair exists but is not equal open a new tab
@@ -119,6 +121,7 @@ for leftGlyphID in thisKernDict.keys():
 if openMacro is True:
 	Glyphs.showMacroWindow()
 	print(macroText[:-1])
+	print("Mirrored pairs: %s" % (counter))
 
 if openNewTab is True: 
 	thisFont.newTab(tabText[:-1]) #check if the tab already exists
