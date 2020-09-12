@@ -10,8 +10,6 @@ Put the scripts into Scripts folder: Library – Application Support - Glyphs - 
 
 The idea of these scripts is to align and reflect nodes and handles with keyboard shortcuts and save a lot of time. I personally use Ctrl + Cmd + Arrow keys. Set it in System Preferences – Keyboard – Shortcuts.
 
-*Note: Align are based on *Distribute Nodes* by [Mekkablue](https://github.com/mekkablue/Glyphs-Scripts).*
-
 ### Mirror Kerning
 Mirrors kerning for symmetrical things like AVA or OVO, etc. You control what to mirror.
 
