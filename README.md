@@ -26,3 +26,6 @@ Toggles dark mode on and off.
 
 ### Demo Instance Generator
 Generates instances with limited character set (customizable) from active instances. Adds “Demo” suffix, removes features and OT classes depending on the character set.
+
+### Text Simplifier
+Removes all characters from a text, except selected ones. Useful for testing WIP fonts with limited character set.
