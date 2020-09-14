@@ -20,7 +20,7 @@ class TextSimplifier ( object ):
 	
 	def __init__(self):
 		# Window 'self.w':
-		windowWidth  = 200
+		windowWidth  = 350
 		windowHeight = 360
 		windowWidthResize  = 1200 # user can resize width by this value
 		windowHeightResize = 500 # user can resize height by this value
