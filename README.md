@@ -25,4 +25,4 @@ Sets (or cleans) *preferredFamily* and *preferredSubfamily* instance custom para
 Toggles dark mode on and off.
 
 ### Demo Instance Generator
-Generates instances with limited character set and features from active instances. Adds “Demo” suffix. Customizable.
+Generates instances with limited character set (customizable) from active instances. Adds “Demo” suffix, removes features and OT classes depending on the character set.
