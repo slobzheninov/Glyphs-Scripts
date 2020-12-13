@@ -1,40 +1,25 @@
 #MenuTitle: Reflect Vertically
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
 __doc__="""
-Reflect Vertically.
+Reflects nodes vertically.
 """
 
+font = Glyphs.font
+selectedLayer = font.selectedLayers[0]
+selection = selectedLayer.selection
+bounds = selectedLayer.selectionBounds
+mid = bounds[0].y + bounds[1].height / 2
 
-
-Font = Glyphs.font
-Doc = Glyphs.currentDocument
-selectedLayer = Font.selectedLayers[0]
-
-try:
-	try:
-		# until v2.1:
-		selection = selectedLayer.selection()
-	except:
-		# since v2.2:
-		selection = selectedLayer.selection
-	
-	selectionYList = [ n.y for n in selection ]
-	lowestY, highestY = min( selectionYList ), max( selectionYList )
-	diffY = abs(lowestY-highestY)
-	midY = highestY - diffY/2
-	
-	Font.disableUpdateInterface()
-
-	sortedSelection = sorted( selection, key=lambda n: n.y)
-	for thisNodeIndex in range( len(selection)):
-		sortedSelection[thisNodeIndex].y = sortedSelection[thisNodeIndex].y-(sortedSelection[thisNodeIndex].y-midY)*2
-			
-	Font.enableUpdateInterface()
-	
-except Exception, e:
-	if selection == ():
-		print "Cannot align nodes: nothing selected in frontmost layer."
+for element in selection:
+	if type(element) == GSComponent:
+		y = element.bounds[0].y - element.y # Glyphs 2 and 3 have different y y of components
+		element.y = mid + (mid - element.y)
+		if Glyphs.versionNumber >= 3:
+			element.scale = (1, -element.scale[1])
+		else:
+			element.scale = (1, -1)
 	else:
-		print "Error. Cannot align nodes:", selection
-		print e
-
+		element.y = mid + (mid - element.y)
+		
+Glyphs.clearLog()
