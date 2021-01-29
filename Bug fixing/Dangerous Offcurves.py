@@ -1,4 +1,4 @@
-#MenuTitle: Dangerous offcurves
+#MenuTitle: Dangerous Offcurves
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
 
@@ -21,7 +21,7 @@ font = Glyphs.font
 
 # define how many units away can offcurve points be from the curve segment
 # change this value if needed:
-THRESHOLD = 1 
+THRESHOLD = 0.7
 
 
 
@@ -70,10 +70,10 @@ for glyph in font.glyphs:
 					
 					
 					# if either offcurve point is closer to the curve than THRESHOLD value
-					if ((abs(hIntersection1.x - node.x) < THRESHOLD and
-							abs(vIntersection1.y - node.y) < THRESHOLD) or
-							(abs(hIntersection2.x - node.nextNode.x) < THRESHOLD and
-							abs(vIntersection2.y - node.nextNode.y) < THRESHOLD)):
+					if (abs(hIntersection1.x - node.x) < THRESHOLD or
+							abs(vIntersection1.y - node.y) < THRESHOLD or
+							abs(hIntersection2.x - node.nextNode.x) < THRESHOLD or
+							abs(vIntersection2.y - node.nextNode.y) < THRESHOLD):
 						# collect layers
 						if layer not in problematicLayers:
 							problematicLayers.append( layer )
