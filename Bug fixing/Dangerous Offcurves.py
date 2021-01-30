@@ -21,7 +21,7 @@ font = Glyphs.font
 
 # define how many units away can offcurve points be from the curve segment
 # change this value if needed:
-THRESHOLD = 1
+THRESHOLD = 0.7
 
 
 
@@ -34,8 +34,9 @@ def getHorizontalIntersection( point, a, b, c, d ):
 		intersection = intersections[0].pointValue()
 		return intersection
 	except:
-		print('Could not find horizontal intersection')
-
+		#print('Could not find horizontal intersection')
+		return None
+		
 def getVerticalIntersection( point, a, b, c, d ): 
 	try:		
 		# intersecting line
@@ -45,8 +46,8 @@ def getVerticalIntersection( point, a, b, c, d ):
 		intersection = intersections[0].pointValue()
 		return intersection
 	except:
-		print('Could not find vertical intersection')
-		
+		#print('Could not find vertical intersection')
+		return None
 
 problematicLayers = []
 
@@ -61,23 +62,22 @@ for glyph in font.glyphs:
 					b = (node.x, node.y)
 					c = (node.nextNode.x, node.nextNode.y) 
 					d = (node.nextNode.nextNode.x, node.nextNode.nextNode.y)
-					
 					# get intersection points for two offcurves
 					hIntersection1 = getHorizontalIntersection( node, a, b, c, d )
 					vIntersection1 = getVerticalIntersection( node, a, b, c, d )
 					hIntersection2 = getHorizontalIntersection( node.nextNode, a, b, c, d )
 					vIntersection2 = getVerticalIntersection( node.nextNode, a, b, c, d )
 					
-					
-					# if either offcurve point is closer to the curve than THRESHOLD value
-					if (abs(hIntersection1.x - node.x) < THRESHOLD or
-							abs(vIntersection1.y - node.y) < THRESHOLD or
-							abs(hIntersection2.x - node.nextNode.x) < THRESHOLD or
-							abs(vIntersection2.y - node.nextNode.y) < THRESHOLD):
-						# collect layers
-						if layer not in problematicLayers:
-							problematicLayers.append( layer )
-						print('%s -- %s' %(layer.parent.name, layer.name))
+					if hIntersection1 and vIntersection1 and hIntersection2 and vIntersection2:
+						# if either offcurve point is closer to the curve than THRESHOLD value
+						if (abs(hIntersection1.x - node.x) < THRESHOLD or
+								abs(vIntersection1.y - node.y) < THRESHOLD or
+								abs(hIntersection2.x - node.nextNode.x) < THRESHOLD or
+								abs(vIntersection2.y - node.nextNode.y) < THRESHOLD):
+							# collect layers
+							if layer not in problematicLayers:
+								problematicLayers.append( layer )
+							print('%s -- %s' %(layer.parent.name, layer.name))
 
 # open a new tab with potentially problematic layers
 if problematicLayers:
