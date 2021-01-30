@@ -21,7 +21,7 @@ font = Glyphs.font
 
 # define how many units away can offcurve points be from the curve segment
 # change this value if needed:
-THRESHOLD = 0.7
+THRESHOLD = 0.05
 
 
 
