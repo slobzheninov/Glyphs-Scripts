@@ -21,12 +21,14 @@ Generates instances with limited character set (customizable) from active instan
 ### Text Filter
 Removes all characters from a text, except selected ones. Useful for testing WIP fonts with limited character set.
 
-### Dangerous Offcurves
-Checks if there are any off-curve points (handles) dangerously close to their curve segment (that may cause problems with conversion to True Type bezier for variable fonts). Opens problematic layers in a new tab. Default threshold value is 0.05 units.
-
 ### G2 Harmonize
 Harmonizes any selected on-curve points. Algorythm found at @simoncozens.
 
+### Dangerous Offcurves
+Checks if there are any off-curve points (handles) dangerously close to their curve segment (that may cause problems with conversion to True Type bezier for variable fonts). Opens problematic layers in a new tab. Default threshold value is 0.05 units.
+
+### Point Counter
+Shows how many points are there in each layer of the current glyph. Useful for fixing interpolation.
 
 
 
