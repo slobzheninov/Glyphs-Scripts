@@ -31,7 +31,7 @@ Harmonizes any selected on-curve points. Algorythm found at @simoncozens.
 
 
 ### License
-Copyright 2020 The slobzheninov Glyphs-Scripts Project Authors.
+Copyright 2020 Alex Slobzheninov.
 
 Some algorithm input by Simon Cozens (@simoncozens).
 
