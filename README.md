@@ -7,7 +7,6 @@ Put the scripts into Scripts folder: Library – Application Support - Glyphs - 
 (Cmd + Shift + Y)
 
 ### Align, Reflect and Rotate
-
 Align and reflect nodes and handles. Useful with keyboard shortcuts — I personally use Ctrl + Cmd + Arrow keys. Set it in System Preferences – Keyboard – Shortcuts.
 
 ### Preferred Names
@@ -24,6 +23,9 @@ Removes all characters from a text, except selected ones. Useful for testing WIP
 
 ### Dangerous Offcurves
 Checks if there are any off-curve points (handles) dangerously close to their curve segment (that may cause problems with conversion to True Type bezier for variable fonts). Opens problematic layers in a new tab. Default threshold value is 0.05 units.
+
+### G2 Harmonize
+Harmonizes any selected on-curve points. Algorythm found at @simoncozens.
 
 
 
