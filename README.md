@@ -24,3 +24,17 @@ Removes all characters from a text, except selected ones. Useful for testing WIP
 
 ### Dangerous Offcurves
 Checks if there are any off-curve points (handles) dangerously close to their curve segment (that may cause problems with conversion to True Type bezier for variable fonts). Opens problematic layers in a new tab. Default threshold value is 1 unit.
+
+
+
+
+### License
+Copyright 2020 The slobzheninov Glyphs-Scripts Project Authors.
+
+Some algorithm input by Simon Cozens (@simoncozens).
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use the software provided here except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+See the License file included in this repository for further details.
