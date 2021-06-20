@@ -23,7 +23,7 @@ Generates instances with limited character set (customizable) from active instan
 Removes all characters from a text, except selected ones. Useful for testing WIP fonts with limited character set.
 
 ### Dangerous Offcurves
-Checks if there are any off-curve points (handles) dangerously close to their curve segment (that may cause problems with conversion to True Type bezier for variable fonts). Opens problematic layers in a new tab. Default threshold value is 1 unit.
+Checks if there are any off-curve points (handles) dangerously close to their curve segment (that may cause problems with conversion to True Type bezier for variable fonts). Opens problematic layers in a new tab. Default threshold value is 0.05 units.
 
 
 
