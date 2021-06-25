@@ -4,7 +4,7 @@ These are scripts for [Glyphs](https://glyphsapp.com/). Some may not work in Gly
 
 ### Installation: 
 Put the scripts into Scripts folder: Library – Application Support - Glyphs - Scripts
-(Cmd + Shift + Y)
+(Cmd + Shift + Y) or through Plugin Manager in Glyphs 3.
 
 ### Align, Reflect and Rotate
 Align and reflect nodes and handles. Useful with keyboard shortcuts — I personally use Ctrl + Cmd + Arrow keys. Set it in System Preferences – Keyboard – Shortcuts.
@@ -20,7 +20,7 @@ Toggles between masters across axis number 1 (or 2, 3, 4) in current tab.
 
 ### Toggle Italic
 Toggles between upright and italic masters in current tab. Expects that italic and upright masters have the same axes values, except for different 'ital' or 'slnt'.
-I use it with cmd+§.
+I use it with cmd+§. Same as Toggle Axis N, except for it doesn't care what number italic axis is.
 
 ### Demo Instance Generator
 Generates instances with limited character set (customizable) from active instances. Adds “Demo” suffix, removes features and OT classes depending on the character set.
@@ -29,7 +29,7 @@ Generates instances with limited character set (customizable) from active instan
 Removes all characters from a text, except selected ones. Useful for testing WIP fonts with limited character set.
 
 ### G2 Harmonize
-Harmonizes any selected on-curve points. Algorythm found at @simoncozens.
+Harmonizes any selected on-curve points. Algorythm found at @simoncozens. Now the same as Green Harmony plugin.
 
 ### Dangerous Offcurves
 Checks if there are any off-curve points (handles) dangerously close to their curve segment (that may cause problems with conversion to True Type bezier for variable fonts). Opens problematic layers in a new tab. Default threshold value is 0.05 units.
