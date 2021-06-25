@@ -15,8 +15,12 @@ Sets (or cleans) *preferredFamily* and *preferredSubfamily* instance custom para
 ### Dark Mode
 Toggles dark mode on and off.
 
+### Toggle Axis 1–4
+Toggles between masters across axis number 1 (or 2, 3, 4) in current tab.
+
 ### Toggle Italic
 Toggles between upright and italic masters in current tab. Expects that italic and upright masters have the same axes values, except for different 'ital' or 'slnt'.
+I use it with cmd+§.
 
 ### Demo Instance Generator
 Generates instances with limited character set (customizable) from active instances. Adds “Demo” suffix, removes features and OT classes depending on the character set.
