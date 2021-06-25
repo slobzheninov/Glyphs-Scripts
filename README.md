@@ -15,7 +15,7 @@ Sets (or cleans) *preferredFamily* and *preferredSubfamily* instance custom para
 ### Dark Mode
 Toggles dark mode on and off.
 
-### Toggle Axis 1–4
+### Toggle Axis 1
 Toggles between masters across axis number 1 (or 2, 3, 4) in current tab.
 
 ### Toggle Italic
