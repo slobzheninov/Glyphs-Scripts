@@ -18,35 +18,39 @@ for i, axis in enumerate( font.axes ):
 		italicAxisIndex = i
 		break
 
-def getItalicValue( master ):
-  return master.axes[ italicAxisIndex ]
+
+if italicAxisIndex:
+	def getItalicValue( master ):
+	  return master.axes[ italicAxisIndex ]
 
 
-# find "related" masters along italic axis
-relatedMasters = []
-for master in font.masters:
-	if master != selectedMaster:
-		related = True
-		for i, axis in enumerate( master.axes ):
-			if i != italicAxisIndex:
-				if axis != selectedMaster.axes[ i ]:
-					related = False
-		if related is True:
-			relatedMasters.append( master )
+	# find "related" masters along italic axis
+	relatedMasters = []
+	for master in font.masters:
+		if master != selectedMaster:
+			related = True
+			for i, axis in enumerate( master.axes ):
+				if i != italicAxisIndex:
+					if axis != selectedMaster.axes[ i ]:
+						related = False
+			if related is True:
+				relatedMasters.append( master )
 
-# sort by italic value
-relatedMasters.sort( key = getItalicValue )
+	# sort by italic value
+	relatedMasters.sort( key = getItalicValue )
 
-# find next master
-toggleTo = None
-for master in relatedMasters:
-	if master.axes[ italicAxisIndex ] > selectedMaster.axes[ italicAxisIndex ]:
-		toggleTo = master
-		break
-if not toggleTo:
-	toggleTo = relatedMasters[0]
+	# find next master
+	toggleTo = None
+	for master in relatedMasters:
+		if master.axes[ italicAxisIndex ] > selectedMaster.axes[ italicAxisIndex ]:
+			toggleTo = master
+			break
+	if not toggleTo:
+		toggleTo = relatedMasters[0]
 
-# toggle master in current tab
-for i, master in enumerate(font.masters):
-	if master == toggleTo:
-		tab.masterIndex = i			
+	# toggle master in current tab
+	for i, master in enumerate(font.masters):
+		if master == toggleTo:
+			tab.masterIndex = i
+else:
+	print('italic axis not found (ital / slnt)')
