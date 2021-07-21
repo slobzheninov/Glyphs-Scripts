@@ -68,3 +68,5 @@ if layer.selection:
 			# P.nextNode.y += deltaY
 			# P.prevNode.x += deltaX
 			# P.prevNode.y += deltaY
+			
+			layer.updateMetrics()
