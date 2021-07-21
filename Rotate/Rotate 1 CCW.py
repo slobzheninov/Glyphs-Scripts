@@ -7,9 +7,9 @@ Rotates selected nodes and components.
 """
 
 font = Glyphs.font
-selectedLayer = font.selectedLayers[0]
-selection = selectedLayer.selection
-bounds = selectedLayer.selectionBounds
+layer = font.layers[0]
+selection = layer.selection
+bounds = layer.selectionBounds
 
 midX = bounds[0].x + bounds[1].width / 2
 midY = bounds[0].y + bounds[1].height / 2
@@ -47,3 +47,7 @@ for element in selection:
 	else:
 		element.x = newX 
 		element.y = newY
+
+# update metrics
+layer.updateMetrics()
+
