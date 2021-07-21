@@ -6,9 +6,9 @@ Reflects nodes vertically.
 """
 
 font = Glyphs.font
-selectedLayer = font.selectedLayers[0]
-selection = selectedLayer.selection
-bounds = selectedLayer.selectionBounds
+layer = font.layer[0]
+selection = layer.selection
+bounds = layer.selectionBounds
 mid = bounds[0].y + bounds[1].height / 2
 
 for element in selection:
@@ -21,5 +21,8 @@ for element in selection:
 			element.scale = (1, -1)
 	else:
 		element.y = mid + (mid - element.y)
-		
+
+# update metrics
+layer.updateMetrics()
+
 Glyphs.clearLog()
