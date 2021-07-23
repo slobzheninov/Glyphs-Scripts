@@ -8,6 +8,7 @@ Put the scripts into Scripts folder: Library – Application Support - Glyphs - 
 
 ### Align, Reflect and Rotate
 Align and reflect nodes and handles. Useful with keyboard shortcuts — I personally use Ctrl + Cmd + Arrow keys. Set it in System Preferences – Keyboard – Shortcuts.
+Center Selected Glyphs sets equal left and right sidebearings within the same width for all layers of selected glyphs.
 
 ### Preferred Names
 Sets (or cleans) *preferredFamily* and *preferredSubfamily* instance custom parameters. Based on *Font Family Name* and *Instance / Style Name*. Useful for office apps compatibility.
