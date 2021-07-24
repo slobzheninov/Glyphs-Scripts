@@ -6,7 +6,7 @@ Reflects nodes vertically.
 """
 
 font = Glyphs.font
-layer = font.layer[0]
+layer = font.selectedLayers[0]
 selection = layer.selection
 bounds = layer.selectionBounds
 mid = bounds[0].y + bounds[1].height / 2
