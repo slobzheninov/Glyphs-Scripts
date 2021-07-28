@@ -7,8 +7,7 @@ Rotates selected nodes and components.
 """
 
 font = Glyphs.font
-layer = font.layers[0]
-selection = layer.selection
+layer = font.selectedLayers[0]
 bounds = layer.selectionBounds
 
 midX = bounds[0].x + bounds[1].width / 2
@@ -28,25 +27,26 @@ def rotate ( origin, point, angle ):
 	    qy = oy + sin(angle) * (px - ox) + cos(angle) * (py - oy)
 	    return qx, qy
 
-
-for element in selection:
-	newX, newY = rotate (origin, (element.x, element.y), angle )
-	
-	if type(element) == GSComponent:
+if layer:
+	selection = layer.selection
+	for element in selection:
+		newX, newY = rotate (origin, (element.x, element.y), angle )
 		
-		# shift matrix
-		shiftMatrix = [1, 0, 0, 1, -midX, -midY]
-		element.applyTransform( shiftMatrix )
-    	# rotate
-		rotationMatrix = [ cos(-angle), -sin(-angle), sin(-angle), cos(-angle), 0, 0 ]
-		element.applyTransform( rotationMatrix )
-		# shift back
-		shiftMatrix = [1, 0, 0, 1, midX, midY]
-		element.applyTransform( shiftMatrix )
+		if type(element) == GSComponent:
+			
+			# shift matrix
+			shiftMatrix = [1, 0, 0, 1, -midX, -midY]
+			element.applyTransform( shiftMatrix )
+	    	# rotate
+			rotationMatrix = [ cos(-angle), -sin(-angle), sin(-angle), cos(-angle), 0, 0 ]
+			element.applyTransform( rotationMatrix )
+			# shift back
+			shiftMatrix = [1, 0, 0, 1, midX, midY]
+			element.applyTransform( shiftMatrix )
 
-	else:
-		element.x = newX 
-		element.y = newY
+		else:
+			element.x = newX 
+			element.y = newY
 
 # update metrics
 layer.updateMetrics()
