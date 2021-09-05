@@ -31,7 +31,7 @@ Generates instances with limited character set (customizable) from active instan
 Removes all characters from a text, except selected ones. Useful for testing WIP fonts with limited character set.
 
 ### G2 Harmonize
-Harmonizes any selected on-curve points. Algorythm found at @simoncozens. Now the same as Green Harmony plugin.
+Harmonizes any selected on-curve points. Algorithm found at @simoncozens. Now the same as Green Harmony plugin.
 
 ### Dangerous Offcurves
 Checks if there are any off-curve points (handles) dangerously close to their curve segment (that may cause problems with conversion to True Type bezier for variable fonts). Opens problematic layers in a new tab. Default threshold value is 0.05 units.
