@@ -1,14 +1,13 @@
 #MenuTitle: Demo Instances Generator
 # -*- coding: utf-8 -*-
 __doc__="""
-Generates demo instances with limited character set and features from active instances
+Generates demo instances with limited character set and features from active instances. Accepts glyph names separated by spaces.
 """
-import copy
-import string
-import vanilla
+import copy, string, vanilla, re
 from Foundation import NSUserDefaults, NSString
+Glyphs.clearLog()
 
-
+thisFont = Glyphs.font
 
 m = 15 # margin
 tm = 35 # top/vertical margin
@@ -42,7 +41,7 @@ class DemoFontsGenerator ( object ):
 		self.windowResize(None)
 		
 		# Run Button:
-		self.w.runButton = vanilla.Button((-80-m, -20-m, -m, m), "Generate", sizeStyle='regular', callback=self.DemoFontsGeneratorParameters )
+		self.w.runButton = vanilla.Button((-80-m, -20-m, -m, m), "Generate", sizeStyle='regular', callback=self.generateDemoInstances )
 		self.w.setDefaultButton( self.w.runButton )
 		
 		# Reset Button:
@@ -82,7 +81,7 @@ class DemoFontsGenerator ( object ):
 			NSUserDefaults.standardUserDefaults().registerDefaults_(
 				{
 					"save.DemoInstancesGenerator.name": "Demo",
-					"save.DemoInstancesGenerator.glyphs": "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9 . , - space",
+					"save.DemoInstancesGenerator.glyphs": "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z a b c d e f g h i j k l m n o p q r s t u v w x y z zero one two three four five seven eight period comma space hyphen b.calt f.calt h.calt k.calt l.calt f_t t_t A-cy Be-cy Ve-cy Ge-cy De-cy Ie-cy Io-cy Zhe-cy Ze-cy Ii-cy Iishort-cy Ka-cy El-cy Em-cy En-cy O-cy Pe-cy Er-cy Es-cy Te-cy U-cy Ef-cy Ha-cy Tse-cy Che-cy Sha-cy Shcha-cy Yeru-cy Softsign-cy Ereversed-cy Iu-cy Ia-cy a-cy be-cy ve-cy ge-cy de-cy ie-cy io-cy zhe-cy ze-cy ii-cy iishort-cy ka-cy el-cy em-cy en-cy o-cy pe-cy er-cy es-cy te-cy u-cy ef-cy ha-cy tse-cy che-cy sha-cy shcha-cy yeru-cy softsign-cy ereversed-cy iu-cy ia-cy .notdef ",
 				}
 			)
 			self.w.name.set( Glyphs.defaults["save.DemoInstancesGenerator.name"] )
@@ -101,50 +100,94 @@ class DemoFontsGenerator ( object ):
 
 		
 		
-	def DemoFontsGeneratorParameters (self, sender):
-
-		thisFont = Glyphs.fonts[0] # frontmost font
-
-
+	def generateDemoInstances (self, sender):	
+		
+							
+		# pass glyph or class names here
+		def replaceFeatureParameter ( name ):
+			for fname, fcode in newFeatures.items():
+				if (" %s ") %(name) in fcode or (" %s;") %(name) in fcode or (" %s' ") %(name) in fcode:
+					newFeatureCode = ''
+					for line in fcode.splitlines():
+						if line.find( name ) < 0:
+							newFeatureCode = newFeatureCode + line + "\n"
+							
+					if len( newFeatureCode ) == 0:
+						if fname not in featuresToRemove:
+							featuresToRemove.append(fname)
+							newFeatures.pop(fname)						
+					else:
+						newFeatures[fname] = newFeatureCode
+						
+						
 		# glyphs and name to keep
 		demoName = self.w.name.get()
 		demoGlyphs = " %s " %(self.w.glyphs.get())
-
+		demoGlyphsList = list(demoGlyphs.split(" "))
 
 		# list glyphs to remove
-		removeGlyphs = ""
-		removeClasses = ""
-		removeFeatures = ""
+		featuresToRemove = []
+		classesToRemove = []
+		replaceClasses = {}
+		replaceFeatures = {}
 		
-		for glyph in thisFont.glyphs:
-			if (" %s ") %(glyph.string) not in demoGlyphs:
-				if (" %s ") %(glyph.name) not in demoGlyphs:
-					removeGlyphs += ("%s, ") %(glyph.name)	
-					
-					# list classes to remove
-					for GSClass in thisFont.classes:						
-						if ("%s ") %(glyph.name) in GSClass.code:
-							if ("%s, ") %(GSClass.name) not in removeClasses:
-								removeClasses += "%s, " %GSClass.name
-								
-								# if removed class is in a feature, list the feature to remove
-								for feature in thisFont.features:
-									if ("%s, ") %(feature.name) not in removeFeatures:
-										if (("%s ") %(GSClass.name) in feature.code) or (("%s' ") %(GSClass.name) in feature.code) or (((" %s;") %(GSClass.name) in feature.code)):
-											removeFeatures += ("%s, ") %(feature.name)	
-					
-					# list features to remove
-					for feature in thisFont.features:
-						if ("%s, ") %(feature.name) not in removeFeatures:
-							if (("%s ") %(glyph.name) in feature.code) or (("%s' ") %(glyph.name) in feature.code) or (((" %s;") %(glyph.name) in feature.code)):
-								removeFeatures += ("%s, ") %(feature.name)	
-												
+		newFeatures = {}
+		for feature in thisFont.features:
+			if feature.active == 1 and not feature.automatic:
+				newFeatures[feature.name] = feature.code
 				
-		print("Removed classes: %s\n" %(removeClasses))
-		print(("Removed features: %s\n" %(removeFeatures)))
+				
+		for glyph in thisFont.glyphs:				
+			if (" %s ") %(glyph.name) not in demoGlyphs:
+				print('not in demo glyphs', glyph.name)
+				# Replace Class custom parameter
+				for GSClass in thisFont.classes:
+					if GSClass.active == 1:
+						if (" %s ") % glyph.name in (' %s ') % GSClass.code:
+							print('----', glyph.name, GSClass.name)
+							if GSClass.name not in replaceClasses.keys():
+								temp = (' %s ' % GSClass.code).replace(' %s ' %glyph.name, ' ')
+								# if code is not empty, otherwise remove the class
+								if temp.strip() != '':
+									replaceClasses[GSClass.name] = temp.rstrip().lstrip()
+								else:
+									classesToRemove += GSClass.name
+									replaceClasses.pop( GSClass.name )
+							else:
+								temp = (' %s ' % replaceClasses[GSClass.name] ).replace(' %s ' %glyph.name, ' ')
+								# if code is not empty, otherwise remove the class
+								if temp.strip() != '':
+									replaceClasses[GSClass.name] = temp.rstrip().lstrip()
+								else:
+									classesToRemove.append( GSClass.name )
+									replaceClasses.pop( GSClass.name )
+				
+				
+				# Replace Feature custom parameter (glyphs)
+				replaceFeatureParameter ( glyph.name )
 						
+		# Replace Feature custom parameter (empty classes)
+		for GSClass in classesToRemove:
+			replaceFeatureParameter ( '@%s' % GSClass )
 
-		# creates copies of active instances, adds limiting custom parameters, adds Demo naming
+		# remove features with no sub or pos
+		for fname, fcode in newFeatures.items():
+			if 'sub' not in fcode and 'pos' not in fcode:
+				featuresToRemove.append( fname )
+				newFeatures.pop(fname)
+		
+		print('delete features: %s\n' %featuresToRemove)
+		print('newFeatures: %s\n' %newFeatures)		
+		print('replaced Classes: %s\n' %replaceClasses)				
+		print('Remove Classes: %s\n' % classesToRemove)
+		
+			
+
+
+
+
+
+		# Create copies of active instances, add limiting custom parameters, add Demo naming
 		def copyInstances():
 			demoInstances = "" #list of demo instances
 			
@@ -154,10 +197,13 @@ class DemoFontsGenerator ( object ):
 			
 			for instance in thisFont.instances:
 				if instance.active:
-					
 					# check if demo already exists
-					if (("%s %s") %(instance.name, demoName) not in demoInstances) and (demoName not in instance.name):
+					if (("%s %s") %(instance.name, demoName) in demoInstances) or (demoName in instance.name):
+						if demoName in instance.name:
+							print("%s already exists" %instance.name)
 						
+					# if demo doesn't exist			
+					else:
 						# copy active instances
 						newInstance = copy.copy(instance)
 						thisFont.instances.append(newInstance)
@@ -184,24 +230,33 @@ class DemoFontsGenerator ( object ):
 						# rename Demo instance (in Glyphs only)
 						newInstance.name = ("%s %s") %(newInstance.name, demoName)
 						#add it to the list
-						demoInstances += "%s, " %newInstance.name
+						demoInstances += "+ %s, " %newInstance.name
 						
 						
 						# rename font files
 						newInstance.customParameters["fileName"] = "%s - %s" %(newInstance.customParameters["preferredFamilyName"], newInstance.customParameters["preferredSubfamilyName"])
 					
 						
-						#limit glyphs, features and classes
-						newInstance.customParameters["Remove Glyphs"] = removeGlyphs
-						newInstance.customParameters["Remove Features"] = removeFeatures
-						newInstance.customParameters["Remove Classes"] = removeClasses
+						# limit glyphs
+						newInstance.customParameters["Keep Glyphs"] = demoGlyphsList
 						
-					# if demo already exists				
-					else:
-						if demoName in instance.name:
-							print("%s already exists" %instance.name)
+						# limit classes
+						for cname, ccode in replaceClasses.items():
+							newInstance.customParameters.append( GSCustomParameter ("Replace Class", '%s; %s' %(cname, ccode) ))
+						if classesToRemove:
+							newInstance.customParameters.append( GSCustomParameter ("Remove Classes", classesToRemove))
+						
+						# limit features
+						for fname, fcode in newFeatures.items():
+							newInstance.customParameters.append( GSCustomParameter ("Replace Feature", '%s; %s' %(fname, fcode) ))
+						if featuresToRemove:
+							newInstance.customParameters.append( GSCustomParameter ("Remove Features", featuresToRemove))
+											
+						# update features parameter?
+						#newInstance.customParameters["Update Features"] = True
+						
 		copyInstances()
-
+		
 DemoFontsGenerator()
 
 
