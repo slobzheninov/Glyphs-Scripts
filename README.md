@@ -39,6 +39,16 @@ Checks if there are any off-curve points (handles) dangerously close to their cu
 ### Point Counter
 Shows how many points are there in each layer of the current glyph. Useful for fixing interpolation.
 
+### Overlap Nodes
+Very specific tool that helps to solve kinks on terminals between narrow and normal widths. Converts this:
+
+![image](https://user-images.githubusercontent.com/60325634/136535807-2c6927ad-ac17-4ab0-9ab2-64e8ee0b0668.png)
+
+
+into this:
+
+![image](https://user-images.githubusercontent.com/60325634/136535872-cb9955f3-7462-4798-9fcf-afa402a0ff8a.png)
+
 
 
 ### License
