@@ -39,6 +39,9 @@ Checks if there are any off-curve points (handles) dangerously close to their cu
 ### Point Counter
 Shows how many points are there in each layer of the current glyph. Useful for fixing interpolation.
 
+### Kern to max
+For the current pair in the edit view, sets the kerning to maximum. Maximum is the half width of the narrower layer in the pair. Useful for kerning (but not overkerning) stuff like .T. or 'A'
+
 ### Overlap Nodes
 Very specific tool that helps to solve kinks on terminals between narrow and normal widths. Converts this:
 
