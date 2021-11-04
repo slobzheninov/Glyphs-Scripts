@@ -9,6 +9,13 @@ Put the scripts into Scripts folder: Library – Application Support - Glyphs - 
 ### Align, Reflect and Rotate
 Align and reflect nodes and handles. Useful with keyboard shortcuts — I personally use Ctrl + Cmd + Arrow keys. Set it in System Preferences – Keyboard – Shortcuts.
 
+#### Align scripts features:
+• align selected nodes
+• align paths (select the whole path) and components
+• align node to the next / previous node (select one node only)
+• align to the next closest measurment line (vertical metrics, half x-height, half cap-height)
+• takes into account the italic angle (which is super duper cool!)
+
 Center Selected Glyphs sets equal left and right sidebearings within the same width for all layers of selected glyphs.
 
 ### Preferred Names
