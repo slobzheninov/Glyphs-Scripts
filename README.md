@@ -15,6 +15,7 @@ Align and reflect nodes and handles. Useful with keyboard shortcuts — I person
 • align node to the next / previous node (select one node only)
 • align to the next closest measurment line (vertical metrics, half x-height, half cap-height)
 • takes into account the italic angle (which is super duper cool!)
+• takes into account smooth connection (“green” nodes)
 
 Center Selected Glyphs sets equal left and right sidebearings within the same width for all layers of selected glyphs.
 
