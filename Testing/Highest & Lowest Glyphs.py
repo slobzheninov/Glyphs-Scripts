@@ -17,7 +17,7 @@ for glyph in font.glyphs:
 			maxY = layer.bounds.origin.y + layer.bounds.size.height
 			highest = layer
 		if not minY or layer.bounds.origin.y < minY:
-			maxY = layer.bounds.origin.y
+			minY = layer.bounds.origin.y
 			lowest = layer
 
 print( 'highest: %s' % maxY )
