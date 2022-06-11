@@ -6,7 +6,7 @@ Aligns nodes and components to the bottom of the selection or nearest metrics.
 """
 DIRECTION = 'Top' # either 'Top' or 'Bottom'
 from math import radians, tan
-from Foundation import NSPoint
+from Foundation import NSPoint, NSEvent
 
 def remap( oldValue, oldMin, oldMax, newMin, newMax):
 	try:

@@ -5,7 +5,7 @@ __doc__="""
 Aligns nodes and components to the vertical center of the selection or nearest metrics.
 """
 from math import radians, tan
-from Foundation import NSPoint
+from Foundation import NSPoint, NSEvent
 
 def remap( oldValue, oldMin, oldMax, newMin, newMax):
 	try:

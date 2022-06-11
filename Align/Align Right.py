@@ -6,7 +6,7 @@ Aligns nodes and components to the right of the selection or nearest metrics.
 """
 DIRECTION = 'Right' # either 'Left' or 'Right'
 from math import radians, tan
-from Foundation import NSPoint
+from Foundation import NSPoint, NSEvent
 
 def remap( oldValue, oldMin, oldMax, newMin, newMax):
 	try:
