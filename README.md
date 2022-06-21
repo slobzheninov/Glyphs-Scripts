@@ -1,6 +1,7 @@
 # About
 
 These are scripts for [Glyphs](https://glyphsapp.com/). Some may not work in Glyphs 3, WIP.
+Some scripts use Vanilla.
 
 ## Installation: 
 Put the scripts into Scripts folder: Library – Application Support - Glyphs - Scripts
@@ -34,10 +35,10 @@ Toggles between upright and italic masters in current tab. Expects that italic a
 I use it with cmd+§. Same as Toggle Axis N, except for it doesn't care what number italic axis is.
 
 ## Demo Instance Generator
-Generates instances with limited character set (customizable) from active instances. Adds “Demo” suffix, removes features and OT classes depending on the character set.
+Generates instances with limited character set (customizable) from active instances. Adds “Demo” suffix, removes features and OT classes depending on the character set. Needs Vanilla.
 
 ## Text Filter
-Removes all characters from a text, except selected ones. Useful for testing WIP fonts with limited character set.
+Removes all characters from a text, except selected ones. Useful for testing WIP fonts with limited character set. Needs Vanilla.
 
 ## G2 Harmonize
 Harmonizes any selected on-curve points. Algorithm found at @simoncozens. Now the same as Green Harmony plugin.
@@ -50,6 +51,10 @@ Shows how many points are there in each layer of the current glyph. Useful for f
 
 ## Kern to max
 For the current pair in the edit view, sets the kerning to maximum. Maximum is the half width of the narrower layer in the pair. Useful for kerning (but not overkerning) stuff like .T. or 'A'
+
+## Reorder Shapes
+A better algorithm for correcting order of shapes (paths, components). It orders paths by length, y, and x. It orders components by glyph name, y, x.
+Works somewhat more reliably than Glyphs' own shape ordering tool.
 
 ## Overlap Nodes
 Very specific tool that helps to solve kinks on terminals between narrow and normal widths. Converts this:
