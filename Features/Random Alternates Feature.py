@@ -206,8 +206,8 @@ class RandomFeature:
 			newFeature = GSFeature( featureName, code )
 			font.feature.append(newFeature)
 
-	# compile features
-	font.compileFeatures()
+		# compile features
+		font.compileFeatures()
 
 
 RandomFeature()
