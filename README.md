@@ -59,6 +59,13 @@ For the current pair in the edit view, sets the kerning to maximum. Maximum is t
 A better algorithm for correcting order of shapes (paths, components). It orders paths by length, y, and x. It orders components by glyph name, y, x.
 Works somewhat more reliably than Glyphs' own shape ordering tool.
 
+## Random Alternates Feature
+Here’s how it works:
+1. Glyphs from selected Categories are randomly added to a selected number of Classes (called rand...).
+2. Then glyphs and its alternatives are randomly placed in 'sub... by ...' sequences of the choosen length.
+3. That can be repeated a few times, depending on how many lookups and lines per lookup you choose.
+Input format: glyph and its alternatives space separated. Next glyph with its alternatives goes to the next line
+
 ## Overlap Nodes
 Very specific tool that helps to solve kinks on terminals between narrow and normal widths. Converts this:
 
