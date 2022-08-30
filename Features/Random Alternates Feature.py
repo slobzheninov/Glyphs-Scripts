@@ -7,7 +7,7 @@ Run the script and read the comment in the OT feature for explanation. For more 
 """
 
 from random import choice, randint
-from vanilla import FloatingWindow, TextBox, EditText, Button
+from vanilla import FloatingWindow, TextBox, EditText, TextEditor, Button
 
 
 font = Glyphs.font
@@ -57,7 +57,7 @@ class RandomFeature:
 		self.w = FloatingWindow((W, H), 'Random Feature', 
 			minSize = ( W, H ), maxSize = ( Wmax, Hmax ))
 		
-		self.w.glyphs = EditText((M, M, -M, -M*14), 'a a.ss01 a.ss02\nb.ss01 b.ss02')
+		self.w.glyphs = TextEditor((M, M, -M, -M*14), 'a a.ss01 a.ss02\nb.ss01 b.ss02')
 
 		# column 1
 		self.w.featureTitle = TextBox((M, -M*13, buttonWidth, M*3), 'Feature')
@@ -205,6 +205,9 @@ class RandomFeature:
 		if featureExists is False:
 			newFeature = GSFeature( featureName, code )
 			font.feature.append(newFeature)
+
+	# compile features
+	font.compileFeatures()
 
 
 RandomFeature()
