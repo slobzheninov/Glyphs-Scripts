@@ -30,6 +30,9 @@ Sets (or cleans) *preferredFamily* and *preferredSubfamily* instance custom para
 ## Dark Mode
 Toggles dark mode on and off.
 
+## Floating Macro Panel
+Toggles Macro panel floating (always on top) on and off.
+
 ## Toggle Axis 1
 Toggles between masters across axis number 1 (or 2, 3, 4) in current tab.
 
@@ -83,6 +86,7 @@ into this:
 Copyright 2020 Alex Slobzheninov.
 
 Some algorithm input by Simon Cozens (@simoncozens).
+Floating window code help by Florian Pircher.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use the software provided here except in compliance with the License. You may obtain a copy of the License at
 
