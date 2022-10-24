@@ -128,7 +128,29 @@ selectedPaths = getSelectedPaths()
 
 def alignToGuides():
 	# collect guides
+	# with no overshoots
 	guides = [layer.master.descender, 0, layer.master.xHeight, layer.master.capHeight, layer.master.ascender, int(layer.master.xHeight/2), int((layer.master.xHeight + layer.master.capHeight)/4), int(layer.master.capHeight/2)]
+
+	# add alignment zones / overshoots
+	descenderZone = layer.master.alignmentZoneForMetric_( layer.master.descender )
+	baselineZone = layer.master.alignmentZoneForMetric_( 0 )
+	xHeightZone = layer.master.alignmentZoneForMetric_( layer.master.xHeight )
+	capHeightZone = layer.master.alignmentZoneForMetric_( layer.master.capHeight )
+	ascenderZone = layer.master.alignmentZoneForMetric_( layer.master.ascender )
+	
+	if descenderZone:
+		guides.append( layer.master.descender + descenderZone.size )
+	if baselineZone:
+		guides.append( baselineZone.size )
+	if xHeightZone:
+		guides.append( layer.master.xHeight + xHeightZone.size )
+	if capHeightZone:
+		guides.append( layer.master.capHeight + capHeightZone.size )
+	if ascenderZone:
+		guides.append( layer.master.ascender + ascenderZone.size )
+	guides.sort()
+
+
 	if len(selection) == 1:
 		# prev next oncurves as guides
 		node = selection[0]
