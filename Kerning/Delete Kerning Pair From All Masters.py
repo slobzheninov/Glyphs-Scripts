@@ -7,18 +7,16 @@ Deletes kerning for the selected pair(s) from all masters.
 
 font = Glyphs.font
 
-
-
 def removeKerning( leftLayer, rightLayer ):
 	# if both are master layers and the master is the same
 	if leftLayer.isMasterLayer and rightLayer.isMasterLayer and leftLayer.master == rightLayer.master:
-		master = leftLayer.master
+		# master = leftLayer.master
 		leftKey = leftLayer.parent.rightKerningKey
 		rightKey = rightLayer.parent.leftKerningKey
 		
 		# set kerning
-		font.removeKerningForPair( master.id, leftKey, rightKey, direction=LTR)
-
+		for master in font.masters:
+			font.removeKerningForPair( master.id, leftKey, rightKey, direction=LTR)
 
 
 # more than 2 layers selected
@@ -37,7 +35,12 @@ if len(font.selectedLayers) > 2:
 else:
 	# get current pair
 	cursor = font.currentTab.textCursor
-	cachedGlyphs = font.parent.windowController().activeEditViewController().graphicView().layoutManager().cachedGlyphs()
+	# Glyphs 2
+	if Glyphs.versionNumber < 3: 
+		cachedGlyphs = font.parent.windowController().activeEditViewController().graphicView().layoutManager().cachedGlyphs()
+	# Glyphs 3
+	else:							
+		cachedGlyphs = font.parent.windowController().activeEditViewController().graphicView().layoutManager().cachedLayers()
 
 	# if at least two layers in the edit view
 	if cachedGlyphs and len(cachedGlyphs) > 1:
