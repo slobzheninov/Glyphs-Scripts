@@ -13,7 +13,9 @@ for window in NSApp.windows():
 		# make normal
 		if window.level() == 3:
 			window.setLevel_(NSNormalWindowLevel)
+			print('Macro panel is not floating now')
 		# make floating
 		else:
 			window.setLevel_(NSFloatingWindowLevel)
+			print('Macro panel is floating now')
 		break
