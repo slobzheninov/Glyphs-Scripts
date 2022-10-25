@@ -58,6 +58,9 @@ Shows how many points are there in each layer of the current glyph. Useful for f
 ## Kern to max
 For the current pair in the edit view, sets the kerning to maximum. Maximum is the half width of the narrower layer in the pair. Useful for kerning (but not overkerning) stuff like .T. or 'A'
 
+## Delete Kerning Pair From All Masters
+Removes kerning for selected pair(s) from all masters. If the glyph has a kerning group, it will remove kerning for that group. Exceptions (open locks) are ignored because it’s unclear how to treat them, especially if not all masters have that exception.
+
 ## Reorder Shapes
 A better algorithm for correcting order of shapes (paths, components). It orders paths by length, y, and x. It orders components by glyph name, y, x.
 Works somewhat more reliably than Glyphs' own shape ordering tool.
