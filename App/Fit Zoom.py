@@ -33,7 +33,7 @@ if textTool:
 	if textRatio > screenRatio:
 		# width
 		viewPort.size.width = tab.bounds.size.width + M*2
-		# x (centered)
+		# x
 		viewPort.origin.x = -M
 		# y (centered)
 		viewPort.origin.y = -viewPort.size.height/2 - tab.bounds.size.height/2
