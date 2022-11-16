@@ -17,11 +17,10 @@ else:
 	textTool = False
 
 
-# set scale to 1
-tab.scale = 1
-
 # text/hand tool > fit all
 if textTool:
+	# set scale to 1
+	tab.scale = 1
 	# set margin (relative)
 	M = tab.bounds.size.width/30
 	# get screen ratio
@@ -54,6 +53,9 @@ if textTool:
 # other tools > fit current layer
 else:
 	if font.selectedLayers:
+		# set scale to 1
+		tab.scale = 1
+		
 		layer = font.selectedLayers[0]
 		# get layer's origin position in tab
 		activePos = font.parent.windowController().activeEditViewController().graphicView().activePosition()
