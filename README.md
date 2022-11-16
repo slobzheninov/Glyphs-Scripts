@@ -73,6 +73,9 @@ Creates a OpenType feature that randomizes alternatives.
 Input format: glyph and its alternatives space separated. Next glyph with its alternatives goes to the next line
 The script is sketchy. The randomness depends on the numbers choosen, give it a try.
 
+## Fit Zoom
+Fits text in current tab into full screen (if Text/Hand tool is selected) or fits current layer (if other tools are being selected). Works weirdly in Glyphs 3. Send help! :)
+
 ## Overlap Nodes
 Very specific tool that helps to solve kinks on terminals between narrow and normal widths. Converts this:
 
