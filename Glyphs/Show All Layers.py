@@ -17,7 +17,7 @@ for layer in layers:
 				allLayers.append( l )
 			allLayers.append( GSControlLayer(10) ) # newline
 
-# append to the current / new tab
+# append to a new tab
 if allLayers:
 	tab = Glyphs.font.newTab('')
 	for layer in allLayers:
