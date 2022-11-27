@@ -22,7 +22,7 @@ Align and reflect nodes and handles. Useful with keyboard shortcuts — I person
 Center Selected Glyphs sets equal left and right sidebearings within the same width for all layers of selected glyphs.
 
 ## Export to All Formats
-Batch-exports the currently active font to otf, ttf and web formats (woff, woff2). Optionally, exports each format to a subfolder. Ignores variable exports.
+Batch-exports the currently active font to otf, ttf and web formats (woff, woff2). Optionally, exports each format to a subfolder. Optionally, exports all fonts currently open in Glyphs. Ignores variable exports.
 
 ## Preferred Names
 Sets (or cleans) *preferredFamily* and *preferredSubfamily* instance custom parameters. Based on *Font Family Name* and *Instance / Style Name*. Useful for office apps compatibility.
@@ -93,6 +93,7 @@ Copyright 2020 Alex Slobzheninov.
 
 Some algorithm input by Simon Cozens (@simoncozens).
 Floating window code help by Florian Pircher.
+Distribute Nodes Horizontally/Vertically are a slightly modified version of Distribute Nodes by Rainer Erich Scheichelbauer (@mekkablue)
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use the software provided here except in compliance with the License. You may obtain a copy of the License at
 
