@@ -1,9 +1,12 @@
-#MenuTitle: Export To All Formats
+#MenuTitle: Export To All Formats 2
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
 __doc__="""
-Export to all formats at once. Doesn’t export variable though.
+Export to all formats at once.
 WEB formats are WOFF and WOFF2. If “PS outlines” is off, TT outlines will be exported for the web formats.
+“All open fonts” will export all fonts currently open in Glyphs; otherwise, only currently active one will be exported.
+“Format subfolders” checkbox splits all formats to subfolders.
+Doesn’t export variable.
 """
 
 from vanilla import FloatingWindow, TextBox, PopUpButton, CheckBox, SquareButton, Button, ProgressBar
@@ -14,10 +17,10 @@ Glyphs.clearLog()
 
 # window size and margin
 W, H = 310, 300
-M = 20
+M = 18
 captionWidth = 140
 columnWidth = 50
-lineYs = [ M, M*2.5, M*4, M*5.5, M*7, M*9, M*11, M*13 ] # y of each line (tittle, export, outline flavor, remove overlaps, autohint)
+lineYs = [ M, M*2.5, M*4, M*5.5, M*7, M*9, M*11, M*13, M*15 ] # y of each line (tittle, export, outline flavor, remove overlaps, autohint)
 captions = [ '', 'Export', 'Remove Overlaps', 'Autohint', 'PS Outlines' ]
 formats = ['OTF', 'TTF', 'WEB']
 
@@ -90,11 +93,14 @@ class ExportToAllFormats():
 		if self.exportPath:
 			self.w.exportPath.setTitle( self.exportPath )
 
+		# Export all open fonts
+		self.w.exportAll = CheckBox((M, lineYs[6], W/2, M), 'All open fonts')
+
 		# Subfolders
-		self.w.subfolders = CheckBox((M, lineYs[6], W/2, M), 'Subfolders')
+		self.w.subfolders = CheckBox((W/2, lineYs[6], W/2, M), 'Format subfolders')
 		
-		# run button
-		self.w.run = Button((W/2, lineYs[6], -M, M), 'Export', callback = self.run)
+		# Run button
+		self.w.run = Button((W/2, lineYs[7], -M, M), 'Export', callback = self.run)
 		if self.exportPath:
 			self.w.exportPath.setTitle( self.exportPath )
 
@@ -102,7 +108,7 @@ class ExportToAllFormats():
 		self.w.progress = ProgressBar((M, H+100, -M, M))
 
 		# importing instance
-		self.w.info = TextBox((M, lineYs[7], -M, M), '')
+		self.w.info = TextBox((M, lineYs[8], -M, M), '')
 		self.w.open()
 
 
@@ -128,8 +134,6 @@ class ExportToAllFormats():
 		else:
 			self.w.run.enable( False )
 		
-			
-
 
 	def exportPathCallback( self, sender ):
 		newExportPath = GetFolder(message="Export to", allowsMultipleSelection = False)
@@ -140,90 +144,103 @@ class ExportToAllFormats():
 
 
 	def run( self, sender ):
-		font = Glyphs.font
+		# set Glyphs.defaults["OTFExportPath"] = self.exportPath  if it exists
 
-		# if there's no font, notify about it
-		if font is None:
-			self.w.info.set( 'Seems like no fonts are open.' )
-			return
-		
-		# progress bar setup
-		currentCount = 0
-		instancesCount = 0
-		for instance in font.instances:
-			# ignore variable
-			if Glyphs.versionNumber >= 3 and instance.type == INSTANCETYPEVARIABLE:
-				continue
-			if instance.active:
-				instancesCount += 1
-		formatsCount = 0
-		for formt in formats:
-			if getattr( self.w, 'exportCheckBox' + formt).get():
-				formatsCount += 1
-				if formt == 'WEB':
-					formatsCount += 1 # woff + woff2
-		totalCount = instancesCount * formatsCount
+		# get fonts (all or current one)
+		if self.w.exportAll:
+			fonts = Glyphs.fonts
+		else:
+			fonts = [Glyphs.font]
+
+		# go
+		for font in fonts:
+			# if there's no font, notify about it
+			if font is None:
+				self.w.info.set( 'Seems like no fonts are open.' )
+				return
+			
+			# progress bar setup
+			currentCount = 0
+			instancesCount = 0
+			for instance in font.instances:
+				# ignore variable
+				if Glyphs.versionNumber >= 3 and instance.type == INSTANCETYPEVARIABLE:
+					continue
+				if instance.active:
+					instancesCount += 1
+			formatsCount = 0
+			for formt in formats:
+				if getattr( self.w, 'exportCheckBox' + formt).get():
+					formatsCount += 1
+					if formt == 'WEB':
+						formatsCount += 1 # woff + woff2
+			totalCount = instancesCount * formatsCount
 
 
-		# export
-		for i, formt in enumerate(formats):
+			# export
+			for i, formt in enumerate(formats):
 
-			if getattr( self.w, 'exportCheckBox' + formt).get():
-				# file format
-				# otf/ttf
-				if i < 2:
-					containers = [PLAIN]
-				# web
-				else:
-					containers = [WOFF, WOFF2]
-
-				# format
-				if i == 0: 
-					frmt = OTF
-				elif i == 1:
-					frmt = TTF
-				elif i == 2:
-					if getattr( self.w, 'outlines' + formt).get():
-						frmt = OTF
+				if getattr( self.w, 'exportCheckBox' + formt).get():
+					# file format
+					# otf/ttf
+					if i < 2:
+						containers = [PLAIN]
+					# web
 					else:
+						containers = [WOFF, WOFF2]
+
+					# format
+					if i == 0: 
+						frmt = OTF
+					elif i == 1:
 						frmt = TTF
+					elif i == 2:
+						if getattr( self.w, 'outlines' + formt).get():
+							frmt = OTF
+						else:
+							frmt = TTF
 
-				# remove overlap
-				removeOverlap = getattr( self.w, 'overlaps' + formt).get()
+					# remove overlap
+					removeOverlap = getattr( self.w, 'overlaps' + formt).get()
 
-				# autohint
-				autohint = getattr( self.w, 'autohint' + formt).get()
+					# autohint
+					autohint = getattr( self.w, 'autohint' + formt).get()
 
-				# export destination
-				exportPath = self.exportPath
-				# if path does not exist, warn about it
-				if not os.path.exists( exportPath ):
-					self.w.info.set('That folder does’t exist!')
-					return
-
-				if self.w.subfolders.get():
-					exportPath += '/' + formt + '/'
-					# create folder if it doesn't exist
+					# export destination
+					exportPath = self.exportPath
+					# if path does not exist, warn about it
 					if not os.path.exists( exportPath ):
-						os.makedirs( exportPath )
+						self.w.info.set('That folder does’t exist!')
+						return
 
-				for instance in font.instances:
-					# ignore variable
-					if Glyphs.versionNumber >= 3 and instance.type == INSTANCETYPEVARIABLE:
-						continue
-					if instance.active:
-						instance.generate( Format = frmt, FontPath = exportPath, Containers = containers, RemoveOverlap = removeOverlap, AutoHint = autohint)
+					# add font subfolder, if all exporting
+					if len(fonts) > 1:
+						exportPath += '/' + font.familyName
 
-						# update progress bar
-						currentCount += len(containers)
-						self.w.progress.set(100/totalCount*currentCount)
-						self.w.info.set( '%s/%s  %s %s' %(currentCount, totalCount, formt, instance.name ))
+					# add subfolders
+					if self.w.subfolders.get():
+						exportPath += '/' + formt + '/'
+						# create folder if it doesn't exist
+						if not os.path.exists( exportPath ):
+							os.makedirs( exportPath )
+
+					for instance in font.instances:
+						# ignore variable
+						if Glyphs.versionNumber >= 3 and instance.type == INSTANCETYPEVARIABLE:
+							continue
+						if instance.active:
+							instance.generate( Format = frmt, FontPath = exportPath, Containers = containers, RemoveOverlap = removeOverlap, AutoHint = autohint)
+
+							# update progress bar
+							currentCount += len(containers)
+							self.w.progress.set(100/totalCount*currentCount)
+							self.w.info.set( '%s/%s  %s %s' %(currentCount, totalCount, formt, instance.name ))
 
 
-					
-		# notification
-		self.w.info.set('')
-		Glyphs.showNotification('Export fonts', '%s was exported successfully.' % (font.familyName))
+						
+			# notification
+			self.w.info.set('')
+			Glyphs.showNotification('Export fonts', '%s was exported successfully.' % (font.familyName))
 
 		
 
