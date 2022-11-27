@@ -1,4 +1,4 @@
-#MenuTitle: Export To All Formats 2
+#MenuTitle: Export To All Formats
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
 __doc__="""
@@ -97,7 +97,7 @@ class ExportToAllFormats():
 		self.w.exportAll = CheckBox((M, lineYs[6], W/2, M), 'All open fonts')
 
 		# Subfolders
-		self.w.subfolders = CheckBox((W/2, lineYs[6], W/2, M), 'Format subfolders')
+		self.w.subfolders = CheckBox((W/2, lineYs[6], W/2, M), 'Format subfolders', value=True)
 		
 		# Run button
 		self.w.run = Button((W/2, lineYs[7], -M, M), 'Export', callback = self.run)
@@ -144,7 +144,13 @@ class ExportToAllFormats():
 
 
 	def run( self, sender ):
-		# set Glyphs.defaults["OTFExportPath"] = self.exportPath  if it exists
+		# if export folder does not exist, warn about it
+		if not os.path.exists( self.exportPath ):
+			self.w.info.set('That folder does’t exist!')
+			return
+
+		# update current default path
+		Glyphs.defaults["OTFExportPath"] = self.exportPath
 
 		# get fonts (all or current one)
 		if self.w.exportAll:
@@ -208,10 +214,10 @@ class ExportToAllFormats():
 
 					# export destination
 					exportPath = self.exportPath
-					# if path does not exist, warn about it
-					if not os.path.exists( exportPath ):
-						self.w.info.set('That folder does’t exist!')
-						return
+					# # if path does not exist, warn about it
+					# if not os.path.exists( exportPath ):
+					# 	self.w.info.set('That folder does’t exist!')
+					# 	return
 
 					# add font subfolder, if all exporting
 					if len(fonts) > 1:
