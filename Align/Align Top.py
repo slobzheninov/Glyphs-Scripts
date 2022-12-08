@@ -132,11 +132,24 @@ def alignToGuides():
 	guides = [layer.master.descender, 0, layer.master.xHeight, layer.master.capHeight, layer.master.ascender, int(layer.master.xHeight/2), int((layer.master.xHeight + layer.master.capHeight)/4), int(layer.master.capHeight/2)]
 
 	# add alignment zones / overshoots
-	descenderZone = layer.master.alignmentZoneForMetric_( layer.master.descender )
-	baselineZone = layer.master.alignmentZoneForMetric_( 0 )
-	xHeightZone = layer.master.alignmentZoneForMetric_( layer.master.xHeight )
-	capHeightZone = layer.master.alignmentZoneForMetric_( layer.master.capHeight )
-	ascenderZone = layer.master.alignmentZoneForMetric_( layer.master.ascender )
+	if Glyphs.versionNumber < 3: # Glyphs 2
+		descenderZone = layer.master.alignmentZoneForMetric_( layer.master.descender )
+		baselineZone = layer.master.alignmentZoneForMetric_( 0 )
+		xHeightZone = layer.master.alignmentZoneForMetric_( layer.master.xHeight )
+		capHeightZone = layer.master.alignmentZoneForMetric_( layer.master.capHeight )
+		ascenderZone = layer.master.alignmentZoneForMetric_( layer.master.ascender )
+	else: # Glyphs 3
+		for metric in layer.metrics:
+			if metric.name == 'Descender':
+				descenderZone = metric
+			elif metric.name == 'Baseline':
+				baselineZone = metric
+			elif metric.name == 'x-Height':
+				xHeightZone = metric
+			elif metric.name == 'Cap Height':
+				capHeightZone = metric
+			elif metric.name == 'Ascender':
+				ascenderZone = metric
 	
 	if descenderZone:
 		guides.append( layer.master.descender + descenderZone.size )
