@@ -29,7 +29,9 @@ Sets (or cleans) *preferredFamily* and *preferredSubfamily* instance custom para
 
 ## glyphOrder - Paste
 A simple way to reorder glyphs with glyphOrder custom parameter.
-1. Copy space separeted glyph names; 2. select glyph, in front of which you want to paste them; 3. run the script.
+1. Copy space separeted glyph names;
+2. 2. select glyph, in front of which you want to paste them;
+3. 3. run the script.
 If glyphOrder custom parameter is missing, it will be created.
 
 ## Dark Mode
