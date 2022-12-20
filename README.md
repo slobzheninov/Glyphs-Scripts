@@ -27,6 +27,11 @@ Batch-exports the currently active font to otf, ttf and web formats (woff, woff2
 ## Preferred Names
 Sets (or cleans) *preferredFamily* and *preferredSubfamily* instance custom parameters. Based on *Font Family Name* and *Instance / Style Name*. Useful for office apps compatibility.
 
+## glyphOrder - Paste
+A simple way to reorder glyphs with glyphOrder custom parameter.
+1. Copy space separeted glyph names; 2. select glyph, in front of which you want to paste them; 3. run the script.
+If glyphOrder custom parameter is missing, it will be created.
+
 ## Dark Mode
 Toggles dark mode on and off.
 
