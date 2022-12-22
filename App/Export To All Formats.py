@@ -153,7 +153,7 @@ class ExportToAllFormats():
 		Glyphs.defaults["OTFExportPath"] = self.exportPath
 
 		# get fonts (all or current one)
-		if self.w.exportAll:
+		if self.w.exportAll.get():
 			fonts = Glyphs.fonts
 		else:
 			fonts = [Glyphs.font]
