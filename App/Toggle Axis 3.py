@@ -4,7 +4,6 @@ __doc__="""
 Toggles along masters across the 3rd axis.
 """
 from Foundation import NSUserDefaults, NSString
-Glyphs.clearLog()
 
 
 AXIS = 2	# in Python we count from 0
