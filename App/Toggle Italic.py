@@ -158,7 +158,6 @@ def setMasterLayersToMaster(tab, newMaster, currentMaster=None):
 	textRange = 0
 	for i, layer in enumerate(tab.layers):
 		if layer.isMasterLayer and layer.master == currentMaster:
-			print(layer)
 			if textCursor is None:
 				textCursor = i
 			textRange += 1
