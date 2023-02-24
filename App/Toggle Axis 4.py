@@ -179,6 +179,15 @@ def toggleLayers(selectedLayers, master, tab):
 	# reset master layers to current font master
 	setMasterLayersToMaster(tab, master)
 
+def getViewPortPosition(viewPort):
+	viewPortX = viewPort.origin.x
+	viewPortY = viewPort.origin.y
+	return viewPortX, viewPortY
+
+def setViewPortPosition(tab, viewPort, x, y):
+	viewPort.origin.x = x
+	viewPort.origin.y = y
+	tab.viewPort = viewPort
 
 def toggleAxis():
 	font = Glyphs.font
@@ -193,6 +202,10 @@ def toggleAxis():
 		toggleMaster( selectedMaster )
 	
 	else:
+		# get viewport position
+		viewPort = tab.viewPort
+		viewPortX, viewPortY = getViewPortPosition(viewPort)
+		
 		# check if text tool is selected
 		if Glyphs.currentDocument.windowController().toolDrawDelegate().className() in ['GlyphsToolText', 'GlyphsToolHand']:
 			textTool = True
@@ -207,4 +220,6 @@ def toggleAxis():
 		else:
 			toggleLayers( font.selectedLayers, selectedMaster, tab )
 
+		# restore viewport position
+		setViewPortPosition( tab, viewPort, viewPortX, viewPortY )
 toggleAxis()
