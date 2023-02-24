@@ -40,12 +40,8 @@ Toggles dark mode on and off.
 ## Floating Macro Panel
 Toggles Macro panel floating (always on top) on and off.
 
-## Toggle Axis 1
-Toggles between masters across axis number 1 (or 2, 3, 4) in current tab.
-
-## Toggle Italic
-Toggles between upright and italic masters in current tab. Expects that italic and upright masters have the same axes values, except for different 'ital' or 'slnt'.
-I use it with cmd+§. Same as Toggle Axis N, except for it doesn't care what number italic axis is.
+## Toggle Axis 1 / Toggle Italic
+Toggles between masters across axis number 1 (or 2, 3, 4) or Italic axis (no matter what number it is). Takes into account selected layers in the current tab. Smart enough to toggle special brace layers such as {50, 100, 0} > {50, 100, 15}.
 
 ## Demo Instance Generator
 Generates instances with limited character set (customizable) from active instances. Adds “Demo” suffix, removes features and OT classes depending on the character set. Needs Vanilla.
