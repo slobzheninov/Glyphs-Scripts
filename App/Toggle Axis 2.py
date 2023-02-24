@@ -186,6 +186,10 @@ def toggleAxis():
 	tab = font.currentTab
 	selectedMaster = font.selectedFontMaster
 
+	if AXIS is None or AXIS >= len(font.axes):
+		print("Axis not found")
+		return
+
 	if not tab or not font.selectedLayers:
 		toggleMaster( selectedMaster )
 	

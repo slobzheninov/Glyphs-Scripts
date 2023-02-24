@@ -4,8 +4,6 @@ __doc__="""
 Toggles along masters across the Italic or Slant axis.
 """
 from Foundation import NSUserDefaults, NSString
-Glyphs.clearLog()
-
 
 
 
@@ -20,10 +18,7 @@ def getItalicAxis():
 		else:
 			if axis.axisTag == 'ital' or axis.axisTag == 'slnt':
 				axis = i
-				return axis
-	if axis is None:
-		print("Italic/Slant axis not found. It should be tagged with 'ital' or 'slnt'.")
-
+				return axis		
 AXIS = getItalicAxis()
 
 # Add axes property to layers
@@ -143,7 +138,6 @@ def setMasterLayersToMaster(tab, newMaster, currentMaster=None):
 	newMasterIndex = font.masters.index( newMaster )
 	if currentMaster == None:
 		currentMaster = newMaster
-
 	# toggle master to some other master and back, otherwise it doesn't apply
 	if newMaster == currentMaster:
 		if 0 < newMasterIndex:
@@ -193,14 +187,17 @@ def toggleLayers(selectedLayers, master, tab):
 			tabLayers.append(layer)
 	tab.layers = tabLayers
 
-	# # reset master layers to current font master
-	# setMasterLayersToMaster(tab, master)
-
+	# reset master layers to current font master
+	setMasterLayersToMaster(tab, master)
 
 def toggleAxis():
 	font = Glyphs.font
 	tab = font.currentTab
 	selectedMaster = font.selectedFontMaster
+
+	if AXIS is None or AXIS >= len(font.axes):
+		print("Axis not found")
+		return
 
 	if not tab or not font.selectedLayers:
 		toggleMaster( selectedMaster )
