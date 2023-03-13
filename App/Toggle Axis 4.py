@@ -158,16 +158,16 @@ def setMasterLayersToMaster(tab, newMaster, currentMaster=None):
 	tab.textRange = currentTextRange
 
 
-def toggleLayers(selectedLayers, master, tab):
-	allNextLayers = getAllNextLayers(selectedLayers)
+def toggleLayers(master, tab):
+	allNextLayers = getAllNextLayers(tab.layers)
 	# get layer indices
 	selectionStart = tab.textCursor
 	selectionEnd = tab.textCursor + tab.textRange
-	selectedText = tab.layers[ selectionStart : selectionEnd ]
 
 	tabLayers = []
 	for i, layer in enumerate(tab.layers):
-		if selectionStart <= i < selectionEnd or (selectionStart == selectionEnd and i == selectionStart):
+		# no layers are selected or layer is within the selection
+		if tab.textRange == 0    or    selectionStart <= i < selectionEnd or (selectionStart == selectionEnd and i == selectionStart):
 			nextLayerAxes = allNextLayers[str(layer.axes)]
 			nextLayer = getLayerForAxes(nextLayerAxes, layer)
 			if nextLayer:
@@ -175,6 +175,11 @@ def toggleLayers(selectedLayers, master, tab):
 		else:
 			tabLayers.append(layer)
 	tab.layers = tabLayers
+
+	# reset master layers to current font master
+	relatedMasters = getRelatedMasters(master)
+	nextMaster = getNextLayer(master, relatedMasters)
+	setMasterLayersToMaster(tab, nextMaster)
 
 	# reset master layers to current font master
 	setMasterLayersToMaster(tab, master)
@@ -205,21 +210,11 @@ def toggleAxis():
 		# get viewport position
 		viewPort = tab.viewPort
 		viewPortX, viewPortY = getViewPortPosition(viewPort)
-		
-		# check if text tool is selected
-		if Glyphs.currentDocument.windowController().toolDrawDelegate().className() in ['GlyphsToolText', 'GlyphsToolHand']:
-			textTool = True
-		else:
-			textTool = False
 
-		# text tool mode and no range is selected
-		if textTool and tab.textRange == 0:
-			toggleMaster( selectedMaster )
-
-		# change selected layers only
-		else:
-			toggleLayers( font.selectedLayers, selectedMaster, tab )
+		# toggle layers and masters
+		toggleLayers( selectedMaster, tab )
 
 		# restore viewport position
 		setViewPortPosition( tab, viewPort, viewPortX, viewPortY )
+		
 toggleAxis()
