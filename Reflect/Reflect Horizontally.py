@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
 __doc__="""
-Reflects nodes horizontally.
+Reflects selected nodes and components horizontally.
 """
 
 font = Glyphs.font
@@ -16,7 +16,7 @@ for element in selection:
 		x = element.bounds[0].x - element.x # Glyphs 2 and 3 have different x y of components
 		element.x = mid + (mid - element.x)
 		if Glyphs.versionNumber >= 3:
-			element.scale = (-element.scale[0], 1)
+			element.scale = (-element.scale[0], element.scale[1])
 		else:
 			element.scale = (-1, 1)
 	else:
