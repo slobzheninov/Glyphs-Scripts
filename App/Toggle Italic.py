@@ -225,7 +225,7 @@ def toggleMasterInTab(master, tab):
 			tempTabLayers[i] = nextLayer
 
 		# control layer, skip
-		elif type(selectedLayer) == GSControlLayer:
+		elif type(layer) == GSControlLayer:
 			continue
 
 		# current master layer, just append
