@@ -204,7 +204,7 @@ class RandomFeature:
 				break
 		if featureExists is False:
 			newFeature = GSFeature( featureName, code )
-			font.feature.append(newFeature)
+			font.features.append(newFeature)
 
 		# compile features
 		font.compileFeatures()
