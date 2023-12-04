@@ -71,7 +71,7 @@ Works somewhat more reliably than Glyphs' own shape ordering tool.
 ## Generate Random Alternates Feature
 Creates an OpenType feature that randomizes alternatives.
 1. Glyphs from the selected Categories are randomly added to the selected number of Classes (called rand...).
-2. Then glyphs and its alternatives are randomly placed in 'sub... by ...' sequences of the choosen length.
+2. Then glyphs and its alternatives are randomly placed in 'sub... by ...' sequences of the chosen length.
 3. That can be repeated a few times, depending on how many lookups and lines per lookup you choose.
 Input format: glyph and its alternatives space separated. Next glyph with its alternatives go to the next line.
 The script is sketchy. The randomness depends on the numbers of classes and lines; I’d say start low and increase the values until it feel right.
