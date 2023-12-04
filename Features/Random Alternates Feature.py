@@ -1,4 +1,4 @@
-#MenuTitle: Random Alternates Feature
+#MenuTitle: Generate Random Alternates Feature
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
 __doc__="""
@@ -13,17 +13,6 @@ from vanilla import FloatingWindow, TextBox, EditText, TextEditor, Button
 font = Glyphs.font
 Glyphs.clearLog()
 
-
-# featureName = 'calt'
-
-# categories = ['Letter', 'Punctuation']
-# classesToAdd = 3
-# sequence = 3
-# linesToAdd = 20
-# lookupsToAdd = 4
-
-
-defaultList = [{'Default Glyph' : 'a', 'Alternatives' : 'a.ss01 a.ss02'}]
 
 comment = """# This is your random feature!
 # Here’s how it works:
@@ -57,7 +46,7 @@ class RandomFeature:
 		self.w = FloatingWindow((W, H), 'Random Feature', 
 			minSize = ( W, H ), maxSize = ( Wmax, Hmax ))
 		
-		self.w.glyphs = TextEditor((M, M, -M, -M*14), 'a a.ss01 a.ss02\nb.ss01 b.ss02')
+		self.w.glyphs = TextEditor((M, M, -M, -M*14), 'a a.ss01 a.ss02\nb b.ss01 b.ss02')
 
 		# column 1
 		self.w.featureTitle = TextBox((M, -M*13, buttonWidth, M*3), 'Feature')
@@ -83,8 +72,6 @@ class RandomFeature:
 
 		self.w.open()
 
-
-
 	def editTextCallback( self, sender ):
 		# int input only!
 		inpt = sender.get()
@@ -92,8 +79,6 @@ class RandomFeature:
 			sender.set( str(int(inpt)) )
 		except:
 			sender.set( '3' )
-
-
 
 	def runCallback( self, sender ):
 		glyphs = {}
@@ -136,7 +121,6 @@ class RandomFeature:
 		except:
 			print('Couldn’t read the input')
 			return
-
 
 
 		# ---------- classes
