@@ -3,7 +3,7 @@
 from __future__ import division, print_function, unicode_literals
 __doc__="""
 Creates a Random Alternates feature (calt by default). Replaces the existing feature code, if any.
-Run the script and read the comment in the OT feature for explanation. For more info, github.com/slobzheninov
+Run the script and read the comment in the OT feature for an explanation. For more info, github.com/slobzheninov
 """
 
 from random import choice, randint
