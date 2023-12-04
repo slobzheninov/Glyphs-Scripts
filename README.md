@@ -68,7 +68,7 @@ Removes kerning for selected pair(s) from all masters. If the glyph has a kernin
 A better algorithm for correcting order of shapes (paths, components). It orders paths by length, y, and x. It orders components by glyph name, y, x.
 Works somewhat more reliably than Glyphs' own shape ordering tool.
 
-## Random Alternates Feature
+## Generate Random Alternates Feature
 Creates a OpenType feature that randomizes alternatives.
 1. Glyphs from selected Categories are randomly added to a selected number of Classes (called rand...).
 2. Then glyphs and its alternatives are randomly placed in 'sub... by ...' sequences of the choosen length.
