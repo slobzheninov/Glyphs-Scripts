@@ -2,27 +2,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
 __doc__="""
-Reflects selected nodes and components vertically.
+Flip selected nodes and components vertically.
 """
 
-font = Glyphs.font
-layer = font.selectedLayers[0]
-selection = layer.selection
-bounds = layer.selectionBounds
-mid = bounds[0].y + bounds[1].height / 2
+layer = Glyphs.font.selectedLayers[0]
+mid = layer.selectionBounds[0].y + layer.selectionBounds[1].height / 2
 
-for element in selection:
+for element in layer.selection:
+	element.y = mid - element.y + mid
 	if type(element) == GSComponent:
-		y = element.bounds[0].y - element.y # Glyphs 2 and 3 have different x y of components
-		element.y = mid + (mid - element.y)
-		if Glyphs.versionNumber >= 3:
-			element.scale = (element.scale[0], -element.scale[1])
-		else:
-			element.scale = (1, -1)
-	else:
-		element.y = mid + (mid - element.y)
+		element.scale = (element.scale[0], -element.scale[1])
 
 # update metrics
 layer.updateMetrics()
-
-Glyphs.clearLog()
