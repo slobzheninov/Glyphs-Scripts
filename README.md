@@ -90,6 +90,9 @@ into this:
 ![image](https://user-images.githubusercontent.com/60325634/136535872-cb9955f3-7462-4798-9fcf-afa402a0ff8a.png)
 
 
+## Steal kerning from next pair at cursor's Y
+Set’s the kerning for the current pair based on the distance between the next 2 glyphs, as measured at the cursor’s vertical position.
+Example: to kern AV the same as VA, type AVVA, place the cursor between AV, and point with the mouse at which vertical position you want the same distance between AV and VA.
 
 ### License
 Copyright 2020 Alex Slobzheninov.
