@@ -22,7 +22,7 @@ Align and reflect nodes and handles. Useful with keyboard shortcuts — I person
 Center Selected Glyphs sets equal left and right sidebearings within the same width for all layers of selected glyphs.
 
 ## Export to All Formats
-Batch-exports the currently active font to otf, ttf and web formats (woff, woff2). Optionally, exports each format to a subfolder. Optionally, exports all fonts currently open in Glyphs. Ignores variable exports.
+Batch-exports the currently active font to otf, ttf, web (woff, woff2) and variable formats. Optionally, exports each format to a subfolder. Optionally, exports all fonts currently open in Glyphs.
 
 ## Preferred Names
 Sets (or cleans) *preferredFamily* and *preferredSubfamily* instance custom parameters. Based on *Font Family Name* and *Instance / Style Name*. Useful for office apps compatibility.
