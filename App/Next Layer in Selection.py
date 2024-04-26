@@ -9,7 +9,7 @@ Uses the first glyph’s layers to determine “next layer”.
 
 direction = 1 # -1 = previous, 1 = next
 
-def get_prev_or_next_layer(layer, direction = 1):
+def get_prev_or_next_layer(layer, direction):
 	try:
 		layers = layer.parent.sortedLayers()
 		layer_index = layers.indexOfObject_(layer)
@@ -87,7 +87,7 @@ def switch_layers(direction = 1):
 	selection_end = tab.textCursor + tab.textRange
 	first_layer = tab.layers[selection_start]
 	try:
-		new_first_layer = get_prev_or_next_layer(first_layer)
+		new_first_layer = get_prev_or_next_layer(first_layer, direction)
 	except:
 		print(traceback.format_exc())
 		return
