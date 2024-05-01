@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
 import traceback
+from copy import copy
+
 __doc__="""
 Switches to the next layer in all selected glyphs in a tab.
 Uses the first glyph’s layers to determine “next layer”.
