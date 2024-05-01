@@ -64,12 +64,12 @@ def set_master_layers_to_master(font, tab, master):
 			text_range += 1
 		else:
 			if text_cursor is not None:
-				setMaster(font, tab, text_cursor, text_range, toggle, master_index)
+				set_master(font, tab, text_cursor, text_range, toggle, master_index)
 			# reset selection
 			text_cursor = None
 			text_range = 0
 	if text_cursor is not None:
-		setMaster(font, tab, text_cursor, text_range, toggle, master_index)
+		set_master(font, tab, text_cursor, text_range, toggle, master_index)
 
 	# set original user's selection
 	tab.textCursor = current_text_cursor
