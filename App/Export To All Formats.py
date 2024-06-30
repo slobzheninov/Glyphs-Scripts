@@ -209,7 +209,7 @@ class ExportToAllFormats():
 				elif 'Variable' in formt: # 'Variable' or 'Variable WEB'
 					frmt = VARIABLE
 				else:
-					frmt = OTF if i == 0 else TTF
+					frmt = OTF if formt == 'OTF' else TTF
 
 				# set up other options
 				removeOverlap = getattr(self.w, 'overlaps' + formt).get() if 'Variable' not in formt else False
