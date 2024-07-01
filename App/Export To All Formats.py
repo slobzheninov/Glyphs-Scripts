@@ -193,7 +193,7 @@ class ExportToAllFormats():
 					familyNames.append(familyName)
 
 			# create family subfolders
-			if len(familyNames) > 1:
+			if len(familyNames) > 1 or len(fonts) > 1:
 				for familyName in familyNames:
 					if not os.path.exists(fontExportPath + '/' + familyName):
 						os.makedirs(fontExportPath + '/' + familyName)
@@ -227,7 +227,7 @@ class ExportToAllFormats():
 
 					# get export path for one or multiple familyNames
 					exportPath = fontExportPath
-					if len(familyNames) > 1:
+					if len(familyNames) > 1 or len(fonts) > 1:
 						familyName = instance.customParameters['familyName'] if 'familyName' in instance.customParameters else font.familyName
 						exportPath = fontExportPath + '/' + familyName
 
