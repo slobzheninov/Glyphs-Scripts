@@ -248,7 +248,10 @@ class ExportToAllFormats():
 						break # only export for one instance
 
 					# export the instance
-					instance.generate(Format = frmt, FontPath = exportPath, Containers = containers, RemoveOverlap = removeOverlap, AutoHint = autohint)
+					if Glyphs.versionNumber >= 3.3:
+						instance.generate(format = frmt, fontPath = exportPath, containers = containers, removeOverlap = removeOverlap, autoHint = autohint)
+					else:
+						instance.generate(Format = frmt, FontPath = exportPath, Containers = containers, RemoveOverlap = removeOverlap, AutoHint = autohint)
 
 					# update progress bar
 					currentCount += len(containers)
