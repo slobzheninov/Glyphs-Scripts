@@ -1,9 +1,12 @@
 #MenuTitle: Dark Mode
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
-__doc__="""
+__doc__ = """
 Toggles dark mode preview.
 """
+
+from GlyphsApp import Glyphs
+
 if Glyphs.versionNumber >= 3:
 	if Glyphs.defaults["GSEditViewDarkMode"] == 1:
 		Glyphs.defaults["GSEditViewDarkMode"] = 0

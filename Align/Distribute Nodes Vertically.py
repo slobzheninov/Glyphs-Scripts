@@ -1,12 +1,17 @@
 #MenuTitle: Distribute Nodes Vertically
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
-__doc__="""
+
+__doc__ = """
 Distributes the selected nodes vertically.
 """
+
 # This is a slightly modified vertion of Distribute Nodes script by @mekkablue
 
-def distributeNodes(direction): # 0 horizontal, 1 vertical 
+from GlyphsApp import Glyphs
+
+
+def distributeNodes(direction):  # 0 horizontal, 1 vertical
 	font = Glyphs.font
 	if not font.selectedLayers:
 		return
@@ -28,15 +33,15 @@ def distributeNodes(direction): # 0 horizontal, 1 vertical
 		lowestY, highestY = min(selectionYList), max(selectionYList)
 		diffX = abs(leftMostX - rightMostX)
 		diffY = abs(lowestY - highestY)
-		
+
 		font.disableUpdateInterface()
 		try:
-			if direction == 0: # distribute horizontally
+			if direction == 0:  # distribute horizontally
 				increment = diffX / float(len(selection) - 1)
 				sortedSelection = sorted(selection, key=lambda n: n.x)
 				for thisNodeIndex in range(len(selection) - 1):
 					sortedSelection[thisNodeIndex].x = leftMostX + (thisNodeIndex * increment)
-			else: # distribute vertically
+			else:  # distribute vertically
 				increment = diffY / float(len(selection) - 1)
 				sortedSelection = sorted(selection, key=lambda n: n.y)
 				for thisNodeIndex in range(len(selection) - 1):
@@ -49,8 +54,8 @@ def distributeNodes(direction): # 0 horizontal, 1 vertical
 			print()
 			raise e
 		finally:
-			font.enableUpdateInterface() # re-enables UI updates in font View
-		
+			font.enableUpdateInterface()  # re-enables UI updates in font View
+
 	except Exception as e:
 		if selection == ():
 			print("Cannot distribute nodes: nothing selected in frontmost layer.")
@@ -58,4 +63,5 @@ def distributeNodes(direction): # 0 horizontal, 1 vertical
 			print("Error. Cannot distribute nodes:", selection)
 			print(e)
 
-distributeNodes(direction = 1)
+
+distributeNodes(direction=1)

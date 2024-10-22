@@ -4,12 +4,15 @@ from __future__ import division, print_function, unicode_literals
 import traceback
 from copy import copy
 
-__doc__="""
+__doc__ = """
 Switches to the next layer in all selected glyphs in a tab.
 Uses the first glyph’s layers to determine “next layer”.
 """
 
-direction = 1 # -1 = previous, 1 = next
+from GlyphsApp import Glyphs
+
+direction = 1  # -1 = previous, 1 = next
+
 
 def get_prev_or_next_layer(layer, direction):
 	try:
@@ -24,6 +27,7 @@ def get_prev_or_next_layer(layer, direction):
 		return new_layer
 	except:
 		return None
+
 
 def apply_layer_to_selected_glyphs(new_layer, selected_layers):
 	new_selected_layers = []
@@ -50,10 +54,10 @@ def set_master_layers_to_master(font, tab, master):
 	current_text_cursor = tab.textCursor
 	current_text_range = tab.textRange
 	master_index = font.masters.index(master)
-	
+
 	# toggle master to some other master and back, otherwise it doesn't apply
 	toggle = -1 if 0 < master_index else 1
-	
+
 	# select old master layers and apply master
 	text_cursor = None
 	text_range = 0
@@ -76,7 +80,7 @@ def set_master_layers_to_master(font, tab, master):
 	tab.textRange = current_text_range
 
 
-def switch_layers(direction = 1):
+def switch_layers(direction=1):
 	font = Glyphs.font
 	if not font or not font.currentTab or not font.selectedLayers:
 		return
@@ -95,9 +99,9 @@ def switch_layers(direction = 1):
 		return
 
 	# apply the new layer to all selected glyphs; skip if not possible
-	selected_layers = tab.layers[selection_start : selection_end] if tab.textRange else [font.selectedLayers[0]]
+	selected_layers = tab.layers[selection_start:selection_end] if tab.textRange else [font.selectedLayers[0]]
 	new_selected_layers = apply_layer_to_selected_glyphs(new_first_layer, selected_layers)
-	
+
 	# apply layers to the tab
 	if tab.textRange:
 		new_tab_layers = initial_tab_layers[:selection_start] + new_selected_layers + initial_tab_layers[selection_end:]
