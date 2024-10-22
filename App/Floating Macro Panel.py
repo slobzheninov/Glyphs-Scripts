@@ -1,11 +1,12 @@
 #MenuTitle: Floating Macro Panel
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
-__doc__="""
+__doc__ = """
 Toggles Macro panel floating.
 """
 
 from AppKit import NSApp, NSFloatingWindowLevel, NSNormalWindowLevel
+from GlyphsApp import Glyphs
 
 Glyphs.showMacroWindow()
 for window in NSApp.windows():

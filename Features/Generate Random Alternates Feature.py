@@ -1,14 +1,15 @@
 #MenuTitle: Generate Random Alternates Feature
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
-__doc__="""
+__doc__ = """
 Creates a Random Alternates feature (calt by default). Replaces the existing feature code, if any.
 Run the script and read the comment in the OT feature for an explanation. For more info, github.com/slobzheninov
 """
 
+import objc
 from random import choice, randint
 from vanilla import FloatingWindow, TextBox, EditText, TextEditor, Button
-
+from GlyphsApp import Glyphs, GSClass, GSFeature
 
 font = Glyphs.font
 Glyphs.clearLog()
@@ -23,11 +24,14 @@ comment = """# This is your random feature!
 """
 
 GSSteppingTextField = objc.lookUpClass("GSSteppingTextField")
+
+
 class ArrowEditText (EditText):
 	nsTextFieldClass = GSSteppingTextField
+
 	def _setCallback(self, callback):
 		super(ArrowEditText, self)._setCallback(callback)
-		if callback is not None: # and self._continuous:
+		if callback is not None:  # and self._continuous:
 			self._nsObject.setContinuous_(True)
 			self._nsObject.setAction_(self._target.action_)
 			self._nsObject.setTarget_(self._target)
@@ -41,46 +45,45 @@ class RandomFeature:
 
 		M = 10
 		buttonWidth = 80
-		inputWidth = buttonWidth*.6
-		
-		self.w = FloatingWindow((W, H), 'Random Feature', 
-			minSize = ( W, H ), maxSize = ( Wmax, Hmax ))
-		
-		self.w.glyphs = TextEditor((M, M, -M, -M*14), 'a a.ss01 a.ss02\nb b.ss01 b.ss02')
+		inputWidth = buttonWidth * .6
+
+		self.w = FloatingWindow((W, H), 'Random Feature', minSize=(W, H), maxSize=(Wmax, Hmax))
+
+		self.w.glyphs = TextEditor((M, M, -M, -M * 14), 'a a.ss01 a.ss02\nb b.ss01 b.ss02')
 
 		# column 1
-		self.w.featureTitle = TextBox((M, -M*13, buttonWidth, M*3), 'Feature')
-		self.w.feature = EditText((M*2+buttonWidth, -M*13.1, inputWidth, M*2.5), 'calt')
+		self.w.featureTitle = TextBox((M, -M * 13, buttonWidth, M * 3), 'Feature')
+		self.w.feature = EditText((M * 2 + buttonWidth, -M * 13.1, inputWidth, M * 2.5), 'calt')
 
-		self.w.linesTitle = TextBox((M, -M*10, buttonWidth, M*3), 'Lines')
-		self.w.lines = ArrowEditText((M*2+buttonWidth, -M*10.1, inputWidth, M*2.5), '20', continuous = False, callback = self.editTextCallback)
+		self.w.linesTitle = TextBox((M, -M * 10, buttonWidth, M * 3), 'Lines')
+		self.w.lines = ArrowEditText((M * 2 + buttonWidth, -M * 10.1, inputWidth, M * 2.5), '20', continuous=False, callback=self.editTextCallback)
 
-		self.w.sequenceTitle = TextBox((M, -M*7, buttonWidth, M*3), 'Sequence')
-		self.w.sequence = ArrowEditText((M*2+buttonWidth, -M*7.1, inputWidth, M*2.5), '3', continuous = False, callback = self.editTextCallback)
+		self.w.sequenceTitle = TextBox((M, -M * 7, buttonWidth, M * 3), 'Sequence')
+		self.w.sequence = ArrowEditText((M * 2 + buttonWidth, -M * 7.1, inputWidth, M * 2.5), '3', continuous=False, callback=self.editTextCallback)
 
 		# column 2
-		self.w.categoriesTitle = TextBox((M*3+buttonWidth*1.7, -M*13, buttonWidth, M*3), 'Categories')
-		self.w.categories = EditText((M*3+buttonWidth*2.7, -M*13.1, -M, M*2.5), 'Letter Punctuation')
+		self.w.categoriesTitle = TextBox((M * 3 + buttonWidth * 1.7, -M * 13, buttonWidth, M * 3), 'Categories')
+		self.w.categories = EditText((M * 3 + buttonWidth * 2.7, -M * 13.1, -M, M * 2.5), 'Letter Punctuation')
 
-		self.w.lookupsTitle = TextBox((M*3+buttonWidth*1.7, -M*10, buttonWidth, M*3), 'Lookups')
-		self.w.lookups = ArrowEditText((M*3+buttonWidth*2.7, -M*10.1, inputWidth, M*2.5), '4', continuous = False, callback = self.editTextCallback)
+		self.w.lookupsTitle = TextBox((M * 3 + buttonWidth * 1.7, -M * 10, buttonWidth, M * 3), 'Lookups')
+		self.w.lookups = ArrowEditText((M * 3 + buttonWidth * 2.7, -M * 10.1, inputWidth, M * 2.5), '4', continuous=False, callback=self.editTextCallback)
 
-		self.w.classesTitle = TextBox((M*3+buttonWidth*1.7, -M*7, buttonWidth, M*3), 'Classes')
-		self.w.classes = ArrowEditText((M*3+buttonWidth*2.7, -M*7.1, inputWidth, M*2.5), '5', continuous = False, callback = self.editTextCallback)
-		
-		self.w.runButton = Button((-M-buttonWidth, -M*4, buttonWidth, M*3), 'Run', callback = self.runCallback)
+		self.w.classesTitle = TextBox((M * 3 + buttonWidth * 1.7, -M * 7, buttonWidth, M * 3), 'Classes')
+		self.w.classes = ArrowEditText((M * 3 + buttonWidth * 2.7, -M * 7.1, inputWidth, M * 2.5), '5', continuous=False, callback=self.editTextCallback)
+
+		self.w.runButton = Button((-M - buttonWidth, -M * 4, buttonWidth, M * 3), 'Run', callback=self.runCallback)
 
 		self.w.open()
 
-	def editTextCallback( self, sender ):
+	def editTextCallback(self, sender):
 		# int input only!
 		inpt = sender.get()
 		try:
-			sender.set( str(int(inpt)) )
+			sender.set(str(int(inpt)))
 		except:
-			sender.set( '3' )
+			sender.set('3')
 
-	def runCallback( self, sender ):
+	def runCallback(self, sender):
 		glyphs = {}
 
 		# ---------- user input
@@ -93,22 +96,22 @@ class RandomFeature:
 				if default:
 					existingAlts = []
 					missingAlts = []
-					for i in range(len(alts)-1):
+					for i in range(len(alts) - 1):
 						# check if requested alternatives are in the font
 						for alt in alts:
 							if alt in font.glyphs:
 								if alt not in existingAlts:
-									existingAlts.append( alt )
+									existingAlts.append(alt)
 							else:
-								missingAlts.append( alt )
+								missingAlts.append(alt)
 						# add to the dict
 						if existingAlts:
-							glyphs[ default ] = existingAlts
+							glyphs[default] = existingAlts
 
 						if missingAlts:
 							# report missing alternatives
 							print('Glyphs not found are ignored:')
-							print( missingAlts )
+							print(missingAlts)
 
 		# other input
 		try:
@@ -129,14 +132,14 @@ class RandomFeature:
 
 		for i in range(classesToAdd):
 			className = 'rand%s' % i
-			classes.append( GSClass( className, '' ) )
+			classes.append(GSClass(className, ''))
 
 
 		# add glyphs to the classes
 		for glyph in font.glyphs:
 			if glyph.category in categories and glyph.export:
-				classIndex = randint(0, classesToAdd-1)
-				classes[ classIndex ].code += '%s ' % glyph.name
+				classIndex = randint(0, classesToAdd - 1)
+				classes[classIndex].code += '%s ' % glyph.name
 
 		# add classes to the font
 		for clas in classes:
@@ -155,28 +158,28 @@ class RandomFeature:
 		code = comment + '\n'
 
 		for lookupIndex in range(lookupsToAdd):
-			code += 'lookup random%s {\n' %lookupIndex
+			code += 'lookup random%s {\n' % lookupIndex
 
 			for l in range(linesToAdd):
 				line = '\tsub '
 				glyphFrom = choice(list(glyphs))
-				
+
 				# avoid sub A by A
 				for i in range(10):
 					glyphTo = choice(glyphs[glyphFrom])
 					if glyphFrom != glyphTo:
 						break
-			
-				targetGlyphIndex = randint(0, sequence-1)
+
+				targetGlyphIndex = randint(0, sequence - 1)
 				for i in range(sequence):
 					if i == targetGlyphIndex:
 						line += '%s\' ' % glyphFrom
 					else:
-						line += '@rand%s ' % randint(0, classesToAdd-1)
+						line += '@rand%s ' % randint(0, classesToAdd - 1)
 				line += 'by %s;' % glyphTo
 				code += line + '\n'
 
-			code += '} random%s;\n\n' %lookupIndex
+			code += '} random%s;\n\n' % lookupIndex
 
 
 		# add feature to the font
@@ -187,7 +190,7 @@ class RandomFeature:
 				featureExists = True
 				break
 		if featureExists is False:
-			newFeature = GSFeature( featureName, code )
+			newFeature = GSFeature(featureName, code)
 			font.features.append(newFeature)
 
 		# compile features

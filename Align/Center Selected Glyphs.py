@@ -1,9 +1,12 @@
 #MenuTitle: Center Selected Glyphs
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
-__doc__="""
+
+__doc__ = """
 Makes equal left and right sidebearings for all layers in the selected glyphs.
 """
+
+from GlyphsApp import Glyphs
 
 # Center selected glyphs
 
@@ -15,5 +18,5 @@ if font and font.selectedLayers:
 		for layer in glyph.layers:
 			width = layer.width
 			sidebearings = layer.LSB + layer.RSB
-			layer.LSB = int( sidebearings / 2 )
-			layer.width = width	
+			layer.LSB = int(sidebearings / 2)
+			layer.width = width

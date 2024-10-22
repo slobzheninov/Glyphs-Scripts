@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
 from AppKit import NSPoint
-__doc__="""
+__doc__ = """
 Copies kerning value from the next pair, as measured at the current cursor’s vertical position.
 Example: to kern AV the same as VA, type AVVA, place cursor between AV, and point with the mouse where vertically you want to measure the distance.
 """
