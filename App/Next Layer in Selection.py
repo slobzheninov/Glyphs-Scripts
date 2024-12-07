@@ -17,8 +17,7 @@ direction = 1  # -1 = previous, 1 = next
 def get_prev_or_next_layer(layer, direction):
 	try:
 		layers = layer.parent.sortedLayers()
-		layer_index = layers.indexOfObject_(layer)
-		layer_index += direction
+		layer_index = layers.indexOfObject_(layer) + direction
 		if layer_index < 0:
 			layer_index = len(layers) - 1
 		elif layer_index >= len(layers):
@@ -33,10 +32,7 @@ def apply_layer_to_selected_glyphs(new_layer, selected_layers):
 	new_selected_layers = []
 	for layer in selected_layers:
 		l = layer.parent.layerForName_(new_layer.name)
-		if l:
-			new_selected_layers.append(l)
-		else:
-			new_selected_layers.append(layer)
+		new_selected_layers.append(l if l else layer)
 	return new_selected_layers
 
 
@@ -80,6 +76,10 @@ def set_master_layers_to_master(font, tab, master):
 	tab.textRange = current_text_range
 
 
+def text_range_for_layers(layers):
+    return sum(1 if layer.parent.unicode else 2 for layer in layers)
+
+
 def switch_layers(direction=1):
 	font = Glyphs.font
 	if not font or not font.currentTab or not font.selectedLayers:
@@ -89,9 +89,10 @@ def switch_layers(direction=1):
 	initial_tab_layers = copy(tab.layers)
 
 	# get text selection
-	selection_start = tab.textCursor
-	selection_end = tab.textCursor + tab.textRange
-	first_layer = tab.layers[selection_start]
+	selection_start = tab.layersCursor
+	selection_end = tab.layersCursor + len(tab.selectedLayers)
+	first_layer = tab.layers[tab.layersCursor]
+
 	try:
 		new_first_layer = get_prev_or_next_layer(first_layer, direction)
 	except:
@@ -99,10 +100,10 @@ def switch_layers(direction=1):
 		return
 
 	# apply the new layer to all selected glyphs; skip if not possible
-	selected_layers = tab.layers[selection_start:selection_end] if tab.textRange else [font.selectedLayers[0]]
+	selected_layers = tab.selectedLayers
 	new_selected_layers = apply_layer_to_selected_glyphs(new_first_layer, selected_layers)
 
-	# apply layers to the tab
+	# apply layers to the whole tab or only selected layers
 	if tab.textRange:
 		new_tab_layers = initial_tab_layers[:selection_start] + new_selected_layers + initial_tab_layers[selection_end:]
 	else:
