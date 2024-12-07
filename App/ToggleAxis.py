@@ -188,9 +188,9 @@ def toggleMasterInTab(master, tab, AXIS):
 	cachedNextLayers[master.id] = nextMasterId
 	master.font.masterIndex = master.font.masters.index(nextMaster)
 
-	# get text selection
-	selectionStart = tab.textCursor
-	selectionEnd = tab.textCursor + tab.textRange
+	# get layer selection
+	selectionStart = tab.layersCursor
+	selectionEnd = tab.layersCursor + len(tab.selectedLayers)
 
 	# find layers different from tab master (check in the original/temp list)
 	for i, layer in enumerate(tempTabLayers):
@@ -208,7 +208,7 @@ def toggleMasterInTab(master, tab, AXIS):
 			# get next layer (either from cache or do cache it)
 			nextLayerId = cachedNextLayers.get(layer.layerId)
 			if nextLayerId is None:
-				nextLayerId = getNextMasterId(layer.layerId)
+				nextLayerId = getNextMasterId(layer.layerId, AXIS)
 				cachedNextLayers[layer.layerId] = nextLayerId
 			nextLayer = layer.parent.layers[nextLayerId]
 			tempTabLayers[i] = nextLayer

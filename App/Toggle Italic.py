@@ -10,12 +10,9 @@ from GlyphsApp import Glyphs
 
 def getItalicAxis():
 	for i, axis in enumerate(Glyphs.font.axes):
-		if Glyphs.versionNumber < 3:
-			if axis['Tag'] == 'ital' or axis['Tag'] == 'slnt':
-				return i
-		else:
-			if axis.axisTag == 'ital' or axis.axisTag == 'slnt':
-				return i
-
+		axisTag = axis['Tag'] if Glyphs.versionNumber < 3 else axis.axisTag
+		if axisTag in ['ital', 'slnt']:
+			axis = i
+			return axis
 
 toggleAxis(getItalicAxis())
