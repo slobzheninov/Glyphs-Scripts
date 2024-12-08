@@ -23,6 +23,8 @@ Center Selected Glyphs sets equal left and right sidebearings within the same wi
 
 ## Export to All Formats
 Batch-exports the currently active font to otf, ttf, web (woff, woff2) and variable formats. Optionally, exports each format to a subfolder. Optionally, exports all fonts currently open in Glyphs.
+Added an option to post-process (compress) exporteed otf/ttf to web formats, which is faster than exporting them from Glyphs. Needs FontTools.
+To stop exporting, delete or move the folder.
 
 ## Preferred Names
 Sets (or cleans) *preferredFamily* and *preferredSubfamily* instance custom parameters. Based on *Font Family Name* and *Instance / Style Name*. Useful for office apps compatibility.
