@@ -22,7 +22,11 @@ Align and reflect nodes and handles. Useful with keyboard shortcuts — I person
 Center Selected Glyphs sets equal left and right sidebearings within the same width for all layers of selected glyphs.
 
 ## Export to All Formats
-Batch-exports the currently active font to otf, ttf, web (woff, woff2) and variable formats. Optionally, exports each format to a subfolder. Optionally, exports all fonts currently open in Glyphs.
+Batch-exports the currently active font to otf, ttf, web (woff, woff2) and variable formats.
+Options:
+* Separate folders for each format
+* Separate folders for each familyName
+* Export only the current or all open fonts
 Added an option to post-process (compress) exporteed otf/ttf to web formats, which is faster than exporting them from Glyphs. Needs FontTools.
 To stop exporting, delete or move the folder.
 
