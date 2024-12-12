@@ -122,11 +122,14 @@ class ExportToAllFormats():
 		if self.exportPath:
 			self.w.exportPath.setTitle(self.exportPath)
 
-		# Export all open fonts
-		self.w.exportAll = CheckBox((M, lineYs[7], W / 2, M), 'All open fonts')
+		# Family Subfolders
+		self.w.familySubfolders = CheckBox((M+2, lineYs[7], W / 2, M), 'Family folders', value=True)
 
-		# Subfolders
-		self.w.subfolders = CheckBox((W / 2, lineYs[7], W / 2, M), 'Format subfolders', value=True)
+		# Format Subfolders
+		self.w.subfolders = CheckBox((M+2, lineYs[8], W / 2, M), 'Format folders', value=True)
+
+		# Export all open fonts
+		self.w.exportAll = CheckBox((W/2, lineYs[7], W / 2, M), 'All open fonts')
 
 		# Run button
 		self.w.run = Button((W / 2, lineYs[8], -M, M), 'Export', callback=self.run)
@@ -221,7 +224,10 @@ class ExportToAllFormats():
 		for familyName in familyNames:
 
 			# familyName path
-			familyNamePath = self.exportPath + '/' + familyName if len(familyNames) > 1 else self.exportPath
+			if self.w.familySubfolders.get():
+				familyNamePath = self.exportPath + '/' + familyName if len(familyNames) > 1 else self.exportPath
+			else:
+				familyNamePath = self.exportPath
 
 			# format path
 			for formt in selectedFormats:
