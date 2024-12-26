@@ -114,7 +114,8 @@ def getLayerAxes(layer):
 				layerAxes.append(float(axis))
 	if not layerAxes:
 		layerAxes = layer.master.axes
-	layer.setTempData_forKey_(layerAxes)
+	# layer.setTempData_forKey_(layerAxes)
+	layer.setTempData_forKey_(layerAxes, "axes")
 	return layerAxes
 
 
@@ -148,16 +149,16 @@ def getRelatedLayers(specialLayer, AXIS):
 			relatedLayers.append(layer)
 
 	# sort by the AXIS value
-	relatedLayers.sort(key=getAxisValue)
+	relatedLayers.sort(key=lambda layer: getAxisValue(layer, AXIS))
 	return relatedLayers
 
 
-def getNextSpecialLayerName(specialLayer):
-	relatedLayers = getRelatedLayers(specialLayer)
+def getNextSpecialLayerName(specialLayer, AXIS):
+	relatedLayers = getRelatedLayers(specialLayer, AXIS)
 
 	# {} layers
 	if relatedLayers:
-		nextSpecialLayer = getNextMaster(specialLayer.master, relatedLayers)
+		nextSpecialLayer = getNextMaster(specialLayer.master, relatedLayers, AXIS)
 		return nextSpecialLayer.name
 
 	# non {} layers
@@ -217,7 +218,7 @@ def toggleMasterInTab(master, tab, AXIS):
 		elif layer.isSpecialLayer:
 			nextLayerName = cachedNextLayers.get(layer.name)
 			if nextLayerName is None:
-				nextLayerName = getNextSpecialLayerName(layer)
+				nextLayerName = getNextSpecialLayerName(layer, AXIS)
 				cachedNextLayers[layer.name] = nextLayerName
 			nextLayer = layer.parent.layers[nextLayerName]
 			tempTabLayers[i] = nextLayer
