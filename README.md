@@ -33,9 +33,9 @@ To stop exporting, delete or move the folder.
 Beta: exporting multiple “Static Settings”, which allow exporting different versions of the same instances, bulk-applying different custom parameters/names/properties:
 * Add an instance(s) with "Static Setting" in its name. Deactivate it.
 * Add custom parameters and/or change properties (such as the family name) of the "Static Setting" instance
-  * You can find-replace in properties like so: Localized Family Name = "Sans->Serif" will replace all found "Sans" with "Serif" in that property of the instances.
+  * You can find-replace in properties like so: Localized Family Name = "Sans->Serif" will replace all found "Sans" with "Serif" in that property of the instances (useful if you already have multiple familly names in the original instances).
 * On export, the custom parameters and properties of the "Static Setting" instance will be applied to all other instances.
-* If you want to also export the original instances as-is, add "+" to any of the "Static Instance", meaning it will be exported in addition to the original instances.
+* If you want to also export the original instances as-is, add "+" to any of the "Static Setting", meaning it will be exported in addition to the original instances.
 * To turn a Static Setting off, just remove (or otherwise break) "Static Setting" from the instance name.
 
 ## Preferred Names
