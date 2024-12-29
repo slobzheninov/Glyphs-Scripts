@@ -9,19 +9,30 @@ Optionally, separates formats into subfolders.
 Instances with different familyNames go to different subfolders as well.
 """
 
+Glyphs3 = Glyphs.versionNumber >= 3
+
 import os, sys
-from GlyphsApp import Glyphs, GetFolder, INSTANCETYPEVARIABLE, OTF, TTF, VARIABLE, PLAIN, WOFF, WOFF2
+from GlyphsApp import Glyphs, GetFolder, OTF, TTF, VARIABLE, PLAIN, WOFF, WOFF2
+if Glyphs3:
+	from GlyphsApp import INSTANCETYPEVARIABLE
 from vanilla import FloatingWindow, TextBox, CheckBox, SquareButton, Button, ProgressBar
 try:
-	from fontTools.ttLib import TTFont
+	from fontTools import ttLib
 	fontToolsImported = True
 except:
 	fontToolsImported = False
 
-
-
 Glyphs.clearLog()
-Glyphs3 = Glyphs.versionNumber >= 3
+
+# NOTES:
+# STATIC SETTING
+# 	Will apply instance properties and custom parameters from instances called 'Static Setting' (each will be exported separately).
+# 	Replace family names: familyName = 'Right Grotesk -> Right Sans'. Replacement is useful when instance familyNames are like Right Grotesk Text, Right Grotesk Display, etc.
+# 	For variable exports, ensures that origin’s style name = variable style name (Glyphs 3 bug)
+
+# STAT EXPORT
+#	post-processes exported variable files if (basically runs a copy of @mekkablue’s Read and Write STAT Axis Values (OTVAR) after exporting variable instances). Hopefully this is temp
+
 
 # window size and margin
 M = 15
@@ -32,7 +43,8 @@ lineYs = [M, M * 3, M * 5, M * 7, M * 9, M * 11, M * 13, M * 15, M * 17, M * 19]
 lineYs = [y - 7 for y in lineYs]  # shift all vertically a bit
 
 captions = ['', 'Export', 'Autohint', 'Remove Overlaps', 'PS Outlines', 'Compress otf/ttf (faster)']
-formats = ['OTF', 'TTF', 'WEB', 'Variable', 'VariableWEB']
+staticFormats, variableFormats = ['OTF', 'TTF', 'WEB'], ['Variable', 'VariableWEB']
+formats = staticFormats + variableFormats
 
 # No Variable WEB in Glyphs 2
 if Glyphs3 is False:
@@ -122,17 +134,20 @@ class ExportToAllFormats():
 		if self.exportPath:
 			self.w.exportPath.setTitle(self.exportPath)
 
-		# Family Subfolders
-		self.w.familySubfolders = CheckBox((M+2, lineYs[7], W / 2, M), 'Family folders', value=True)
-
 		# Format Subfolders
-		self.w.subfolders = CheckBox((M+2, lineYs[8], W / 2, M), 'Format folders', value=True)
+		self.w.subfolders = CheckBox((M+2, lineYs[7], W / 2, M), 'Format folders', value=True)
+
+		# Family Subfolders
+		self.w.familySubfolders = CheckBox((145, lineYs[7], W / 2, M), 'Family folders', value=True)
+
+		# Unnest components
+		self.w.unnestComponents = CheckBox((260, lineYs[7], W / 2, M), 'Unnest comps', value=True)
 
 		# Export all open fonts
-		self.w.exportAll = CheckBox((W/2, lineYs[7], W / 2, M), 'All open fonts')
+		self.w.exportAll = CheckBox((M+2, lineYs[8], W / 2, M), 'All open fonts')
 
 		# Run button
-		self.w.run = Button((W / 2, lineYs[8], -M, M), 'Export', callback=self.run)
+		self.w.run = Button((145, lineYs[8], -M, M), 'Export', callback=self.run)
 		if self.exportPath:
 			self.w.exportPath.setTitle(self.exportPath)
 
@@ -150,7 +165,8 @@ class ExportToAllFormats():
 				# self.checkBoxCallback(checkbox)
 		# # toggle post-process checkbox
 		self.checkBoxCallback(getattr(self.w, 'postProcessWEB'))
-		self.checkBoxCallback(getattr(self.w, 'postProcessVariableWEB'))
+		if Glyphs3:
+			self.checkBoxCallback(getattr(self.w, 'postProcessVariableWEB'))
 
 		self.w.open()
 
@@ -200,7 +216,6 @@ class ExportToAllFormats():
 		
 		# deactivate run button if no formats are chosen for export		
 		self.w.run.enable(countFormats > 0)
-		
 
 	def exportPathCallback(self, sender):
 		newExportPath = GetFolder(message='Export to', allowsMultipleSelection=False)
@@ -210,18 +225,47 @@ class ExportToAllFormats():
 		self.w.info.set('')
 
 	def getAllFamilyNames(self, fonts, selectedFormats):
-		familyNames = []
+		familyNames = {}
 		for font in fonts:
-			activeInstances = [instance for instance in font.instances if instance.active and (Glyphs3 is False or (('Variable' in selectedFormats or 'VariableWEB' in selectedFormats) or instance.type != INSTANCETYPEVARIABLE))]
-			for instance in activeInstances:
-				familyName = self.getFamilyNameForInstance(instance)
+			fontFamilyNames = {}
+			for instance in font.instances:
+				if instance.active:
+					familyName = self.getFamilyNameForInstance(instance)
+					frmt = 'Static' if Glyphs3 is False or instance.type != INSTANCETYPEVARIABLE else 'Variable'
+					if familyName not in familyNames:
+						fontFamilyNames[familyName] = set()
+					fontFamilyNames[familyName].add(frmt)
+
+			# add static setting, which may modify familyNames
+			for instance in font.instances:
+				if 'Static Setting' in instance.name:
+					familyName = self.getFamilyNameForInstance(instance)
+					if '->' in familyName:
+						# replace all familyNames
+						for famName, formats in dict(fontFamilyNames).items():
+							if 'Static' in formats:
+								temp = familyName.split('->')
+								newFamilyName = famName.replace(temp[0], temp[1])
+								if newFamilyName not in fontFamilyNames:
+									fontFamilyNames[newFamilyName] = set()
+								fontFamilyNames[newFamilyName].add('Static')
+					else:
+						if familyName not in fontFamilyNames:
+							fontFamilyNames[familyName] = set()
+						fontFamilyNames[familyName].add('Static')
+
+			# merge with the full dict
+			for familyName, values in fontFamilyNames.items():
 				if familyName not in familyNames:
-					familyNames.append(familyName)
+					familyNames[familyName] = set()
+				for frmt in values:
+					familyNames[familyName].add(frmt)
+		
 		return familyNames
 
 	def createFolders(self, familyNames, selectedFormats):
 		folders = {}
-		for familyName in familyNames:
+		for familyName, familyNameFormats in familyNames.items():
 
 			# familyName path
 			if self.w.familySubfolders.get():
@@ -233,6 +277,12 @@ class ExportToAllFormats():
 			for formt in selectedFormats:
 				# format subfolders
 				if self.w.subfolders.get():
+					# skip formats which are not used for the family name
+					if formt in staticFormats and 'Static' not in familyNameFormats:
+						continue
+					if formt in variableFormats and 'Variable' not in familyNameFormats:
+						continue
+
 					if formt != 'VariableWEB':
 						formatPath = familyNamePath + '/' + formt + '/'
 					else:  # Put VariableWEB into the variable folder
@@ -267,89 +317,224 @@ class ExportToAllFormats():
 		else:
 			return instance.font.familyName
 
-	def exportInstances(self, fonts, selectedFormats, folders):
-		for font in fonts:
-			# set up the progress bar and count instances and formats
-			activeInstances = [instance for instance in font.instances if instance.active and (Glyphs3 is False or (('Variable' in selectedFormats or 'VariableWEB' in selectedFormats) or instance.type != INSTANCETYPEVARIABLE))]
+	def hasNestedComponents(self, font):
+		for glyph in font.glyphs:
+			for layer in glyph.layers:
+				if self.nestedComponents(layer):
+					return True
 
-			# count formats and total fonts to export
-			formatsCount = 0
-			for frmt in selectedFormats:
-				if frmt == 'WEB' and not self.postProcessWEB:
-					formatsCount += 2
-				elif frmt == 'VariableWEB' and not self.postProcessVariableWEB:
-					formatsCount += 2
-				elif 'WEB' not in frmt:
-					formatsCount += 1
-			totalCount = len(activeInstances) * formatsCount
-			currentCount = 0
+	def nestedComponents(self, layer):
+		componentsInComponents = [c.componentLayer.components for c in layer.components]
+		return any(componentsInComponents)
 
-			# export
-			for formt in selectedFormats:
+	def doUnnestNestedComponents(self, font):
+		# From @mekkablue’s UnnestComponents plugin
+		for glyph in font.glyphs:
+			for layer in glyph.layers:
+				while self.nestedComponents(layer):
+					for c in layer.components:
+						if c.componentLayer.components:
+							c.decompose()
 
-				# skip WEB if it will be doen in post
-				if formt == 'WEB' and self.postProcessWEB:
-					continue
-				if formt == 'VariableWEB' and self.postProcessVariableWEB:
-					continue
-				
-				# get format
-				if formt == 'OTF':
-					frmt = OTF
-				elif formt == 'TTF':
-					frmt = TTF
-				elif formt == 'WEB':
-					frmt = OTF if getattr(self.w, 'outlines' + formt).get() else TTF
-				else: # 'Variable' or 'VariableWEB'
-					frmt = VARIABLE
-				
-				# get parameters
-				containers = [PLAIN] if 'WEB' not in formt else [WOFF, WOFF2]
-				removeOverlap = getattr(self.w, 'overlaps' + formt).get() if 'Variable' not in formt else False
-				autohint = getattr(self.w, 'autohint' + formt).get()
+	def getStaticSettings(self, font):
+		staticSettings = []
+		exportDefault = False
+		for i, instance in enumerate(font.instances):
+			if 'Static Setting' in instance.name:
+				staticSettings.append(i)
+				if '+' in instance.name:
+					exportDefault = True
+		if not staticSettings:
+			exportDefault = True
+		return staticSettings, exportDefault
 
-				for instance in activeInstances:
+	def applyStaticSetting(self, font, staticSettingIndex):
+		sourceInstance = font.instances[staticSettingIndex]
 
-					# format is variable => skip non-variable instances
-					if 'Variable' in formt:
-						if Glyphs3 and instance.type != INSTANCETYPEVARIABLE:
-							continue
-					# format is not variable => skip variable instances
-					elif Glyphs3 and instance.type == INSTANCETYPEVARIABLE:
+		# Copy the custom parameters from the instance
+		for i, instance in enumerate(font.instances):
+			# skip the source instance itself
+			if i == staticSettingIndex:
+				continue
+			
+			# copy properties
+			for prop in sourceInstance.properties:
+				currentProp = instance.propertyForName_(prop.key)
+				newValue = None
+				if '->' in prop.value: # this will only replace if property found, skips otherwise (WIP: needs a better logic!)
+					if currentProp:
+						temp = prop.value.split('->')
+						newValue = str(currentProp.value).replace(temp[0], temp[1])
+						instance.setProperty_value_languageTag_(prop.key, newValue, None)
+				else:
+					newValue = prop.value
+					instance.setProperty_value_languageTag_(prop.key, newValue, None)
+
+			# copy custom parameters
+			for p in sourceInstance.customParameters:
+				instance.addCustomParameter_(p.copy())
+
+	def getLinkedInstance(self, font, instance):
+		for inst in font.instances:
+			if inst.familyName == instance.familyName:
+				if inst.customParameters['temp original name'] and inst.customParameters['temp original name'] == instance.linkStyle:
+					return inst
+				if inst.name == instance.linkStyle:
+					return inst
+
+	def exportInstances(self, font, selectedFormats, folders):
+		if not selectedFormats:
+			return
+
+		# set up the progress bar and count instances and formats
+		activeInstances = [instance for instance in font.instances if instance.active and (Glyphs3 is False or (('Variable' in selectedFormats or 'VariableWEB' in selectedFormats) or instance.type != INSTANCETYPEVARIABLE))]
+
+		# count formats and total fonts to export
+		formatsCount = 0
+		for frmt in selectedFormats:
+			if frmt == 'WEB' and not self.postProcessWEB:
+				formatsCount += 2
+			elif frmt == 'VariableWEB' and not self.postProcessVariableWEB:
+				formatsCount += 2
+			elif 'WEB' not in frmt:
+				formatsCount += 1
+		totalCount = len(activeInstances) * formatsCount
+		currentCount = 0
+
+		# export
+		for formt in selectedFormats:
+
+			# skip WEB if it will be doen in post
+			if formt == 'WEB' and self.postProcessWEB:
+				continue
+			if formt == 'VariableWEB' and self.postProcessVariableWEB:
+				continue
+			
+			# get format
+			if formt == 'OTF':
+				frmt = OTF
+			elif formt == 'TTF':
+				frmt = TTF
+			elif formt == 'WEB':
+				frmt = OTF if getattr(self.w, 'outlines' + formt).get() else TTF
+			else: # 'Variable' or 'VariableWEB'
+				frmt = VARIABLE
+			
+			# get parameters
+			containers = [PLAIN] if 'WEB' not in formt else [WOFF, WOFF2]
+			removeOverlap = getattr(self.w, 'overlaps' + formt).get() if 'Variable' not in formt else False
+			autohint = getattr(self.w, 'autohint' + formt).get()
+
+			for instance in activeInstances:
+				# format is variable => skip non-variable instances
+				if 'Variable' in formt:
+					if Glyphs3 and instance.type != INSTANCETYPEVARIABLE:
 						continue
+				# format is not variable => skip variable instances
+				elif Glyphs3 and instance.type == INSTANCETYPEVARIABLE:
+					continue
 
-					# get familyName for instance
-					familyName = self.getFamilyNameForInstance(instance)
+				# get familyName for instance
+				familyName = self.getFamilyNameForInstance(instance)
 
-					# get export path / folder
-					try:
-						exportPath = folders[familyName][formt]
-						# check if the export folder exists
-						if not os.path.exists(exportPath):
-							print('Couldn’t find the folder for %s - %s - %s' % (familyName, instance.name, formt))
-							Glyphs.showMacroWindow()
-							return
-					except:
+				# get export path / folder
+				try:
+					exportPath = folders[familyName][formt]
+					# check if the export folder exists
+					if not os.path.exists(exportPath):
 						print('Couldn’t find the folder for %s - %s - %s' % (familyName, instance.name, formt))
 						Glyphs.showMacroWindow()
 						return
+				except:
+					print('Couldn’t find the folder for %s - %s - %s' % (familyName, instance.name, formt))
+					Glyphs.showMacroWindow()
+					return
 
-					# export variable in Glyphs 2
-					if formt == 'Variable' and Glyphs3 is False:
-						font.export(FontPath=exportPath, Format=VARIABLE, AutoHint=autohint)
-						break  # only export for one instance
+				# export variable in Glyphs 2
+				if Glyphs3 is False and formt == 'Variable':
+					font.export(FontPath=exportPath, Format=VARIABLE, AutoHint=autohint)
+					break  # only export for one instance
 
-					# export the instance
-					if Glyphs.versionNumber >= 3.3:
-						instance.generate(format=frmt, fontPath=exportPath, containers=containers, removeOverlap=removeOverlap, autoHint=autohint)
-					else:
-						instance.generate(Format=frmt, FontPath=exportPath, Containers=containers, RemoveOverlap=removeOverlap, AutoHint=autohint)
+				
+				# for variable fonts, temporarily set style names from variable style name
+				# this is for a Glyphs 3 bug: Origin and variable style linking uses instance name instead of variable style name (should be fixed in upcoming versions - noted on Dec 15 2024)
+				if instance.type == INSTANCETYPEVARIABLE:
+					for inst in font.instances:
+						if inst.type != INSTANCETYPEVARIABLE and inst.variableStyleName:
+							# instance name
+							inst.customParameters['temp original name'] = inst.name
+							inst.name = inst.variableStyleName
+							# style linking
+							if inst.linkStyle:
+								inst.customParameters['temp original link'] = inst.linkStyle
+								linkedInst = self.getLinkedInstance(font, inst)
+								inst.linkStyle = linkedInst.variableStyleName if linkedInst.variableStyleName else linkedInst.name
 
-					# update progress bar
-					currentCount += len(containers)
-					self.w.progress.set(100 / totalCount * currentCount)
-					self.w.info.set('%s/%s  %s %s' % (currentCount, totalCount, formt, instance.name))
-			Glyphs.showNotification('Export fonts', font.familyName + ' was exported successfully.')
+				# export the instance
+				if Glyphs.versionNumber >= 3.3:
+					result = instance.generate(format=frmt, fontPath=exportPath, containers=containers, removeOverlap=removeOverlap, autoHint=autohint)
+				else:
+					result = instance.generate(Format=frmt, FontPath=exportPath, Containers=containers, RemoveOverlap=removeOverlap, AutoHint=autohint)
+				if result is not True:
+					Glyphs.showMacroWindow()
+					print(result)
+				
+				if instance.type == INSTANCETYPEVARIABLE:
+					# add ttLib table
+					fontFileName = instance.fileName().replace('otf', 'ttf')
+					exportedPath = exportPath + '/' + fontFileName
+					self.addSTAT(instance, exportedPath, fontFileName)
+
+					# bring back origin instance name	
+					for inst in font.instances:
+						if inst.type != INSTANCETYPEVARIABLE:
+							if 'temp original name' in inst.customParameters:
+								inst.name = inst.customParameters['temp original name']
+								del(inst.customParameters['temp original name'])
+							if 'temp original link' in inst.customParameters:
+								inst.linkStyle = inst.customParameters['temp original link']
+								del(inst.customParameters['temp original link'])
+
+
+				# update progress bar
+				currentCount += len(containers)
+				self.w.progress.set(100 / totalCount * currentCount)
+				self.w.info.set('%s/%s  %s %s' % (currentCount, totalCount, formt, instance.name))
+		Glyphs.showNotification('Export fonts', font.familyName + ' was exported successfully.')
+
+
+	def exportInstancesForFonts(self, fonts, selectedFormats, folders):
+		# separate variable and static formats
+		selectedStaticFormats, selectedVariableFormats = [], []
+		for formt in selectedFormats:
+			if formt in variableFormats:
+				selectedVariableFormats.append(formt)
+			else:
+				selectedStaticFormats.append(formt)
+
+
+		for originalFont in fonts:
+
+			# unnest nested components (use a copy of the font)
+			if self.w.unnestComponents.get() and self.hasNestedComponents(originalFont):
+				font = originalFont.copy()
+				font.disablesAutomaticAlignment = True
+				self.doUnnestNestedComponents(font)
+			else:
+				font = originalFont
+
+
+			# get static settings
+			staticSettings, exportDefault = self.getStaticSettings(font)
+
+			# export default static + variable
+			self.exportInstances(font, selectedFormats if exportDefault else selectedVariableFormats, folders)
+
+			# export additional static settings
+			for staticSetting in staticSettings:
+				staticSettingsFont = font.copy()
+				self.applyStaticSetting(staticSettingsFont, staticSettingIndex = staticSetting)
+				self.exportInstances(staticSettingsFont, selectedStaticFormats, folders)
 
 
 	def compressFontsInFolder(self, sourcePath, exportPath, sourceFormats = ['.ttf']):
@@ -367,7 +552,7 @@ class ExportToAllFormats():
 		for file_ in sourceFiles:
 			fontPath = sourcePath + '/' + file_
 			fontExportPath = exportPath + '/' + file_
-			font = TTFont(fontPath)
+			font = ttLib.TTFont(fontPath)
 			font.flavor = 'woff'
 			font.save(fontExportPath.replace(ext, '.woff'))
 			font.flavor = 'woff2'
@@ -406,6 +591,119 @@ class ExportToAllFormats():
 						exportPath = formatSubfolders['VariableWEB']
 						self.compressFontsInFolder(sourcePath, exportPath, sourceFormats)
 
+
+	def addSTAT(self, instance, fontPath, fontFileName):
+		# @mekkablue’s Read and Write STAT Axis Values (OTVAR)
+		font = ttLib.TTFont(fontPath)
+		parameterName = "Axis Values"
+		
+		def designAxisRecordDict(statTable):
+			axes = []
+			for axis in statTable.DesignAxisRecord.Axis:
+				axes.append({
+					"nameID": axis.AxisNameID,
+					"tag": axis.AxisTag,
+					"ordering": axis.AxisOrdering,
+				})
+				# print(f"- {axis.AxisTag} axis: AxisNameID {axis.AxisNameID}, AxisOrdering {axis.AxisOrdering}")
+			return axes
+
+		def nameDictAndHighestNameID(nameTable):
+			nameDict = {}
+			highestID = 255
+			for nameTableEntry in nameTable.names:
+				nameID = nameTableEntry.nameID
+				if nameID > highestID:
+					highestID = nameID
+				nameValue = nameTableEntry.toStr()
+				if nameValue not in nameDict.keys():
+					nameDict[nameValue] = nameID
+			return nameDict, highestID
+			
+		def parameterToSTAT(variableFontExport, font, fontpath, fontFileName):
+			nameTable = font["name"]
+			nameDict, highestID = nameDictAndHighestNameID(nameTable)
+			statTable = font["STAT"].table
+			axes = designAxisRecordDict(statTable)
+
+			newAxisValues = []
+			for parameter in variableFontExport.customParameters:
+				if parameter.name == parameterName and parameter.active:
+					statCode = parameter.value
+					# print(f"\n👨🏼‍🏫 Parsing parameter value: {statCode.strip()}")
+
+					axisTag, axisValueCode = statCode.split(";")
+					axisTag = axisTag.strip()
+					for i, axisInfo in enumerate(axes):
+						if axisTag == axisInfo["tag"]:
+							axisIndex = i
+							break
+
+					if len(axisTag) > 4:
+						# print(f"⚠️ axis tag ‘{axisTag}’ is too long, will shorten to first 4 characters.")
+						axisTag = axisTag[:4]
+
+					for entryCode in axisValueCode.split(","):
+						newAxisValue = ttLib.tables.otTables.AxisValue()
+						entryValues, entryName = entryCode.split("=")
+						entryName = entryName.strip()
+						entryFlags = 0
+						if entryName.endswith("*"):
+							entryFlags = 2
+							entryName = entryName[:-1]
+
+						if entryName in nameDict.keys():
+							entryValueNameID = nameDict[entryName]
+						else:
+							# add name entry:
+							highestID += 1
+							entryValueNameID = highestID
+							nameTable.addName(entryName, platforms=((3, 1, 1033), ), minNameID=highestID - 1)
+							nameDict[entryName] = entryValueNameID
+							# print(f"- Adding nameID {entryValueNameID}: ‘{entryName}’")
+
+						if ">" in entryValues:  # Format 3, STYLE LINKING
+							entryValue, entryLinkedValue = [float(x.strip()) for x in entryValues.split(">")]
+							newAxisValue.Format = 3
+							newAxisValue.AxisIndex = axisIndex
+							newAxisValue.ValueNameID = entryValueNameID
+							newAxisValue.Flags = entryFlags
+							newAxisValue.Value = entryValue
+							newAxisValue.LinkedValue = entryLinkedValue
+							# print(f"- AxisValue {axisTag} ‘{entryName}’, Format {newAxisValue.Format}, AxisIndex {newAxisValue.AxisIndex}, ValueNameID {newAxisValue.ValueNameID}, Flags {newAxisValue.Flags}, Value {newAxisValue.Value}, LinkedValue {newAxisValue.LinkedValue}")
+
+						elif ":" in entryValues:  # Format 2, RANGE
+							entryRangeMinValue, entryNominalValue, entryRangeMaxValue = [float(x.strip()) for x in entryValues.split(":")]
+							newAxisValue.Format = 2
+							newAxisValue.AxisIndex = axisIndex
+							newAxisValue.ValueNameID = entryValueNameID
+							newAxisValue.Flags = entryFlags
+							newAxisValue.RangeMinValue = entryRangeMinValue
+							newAxisValue.NominalValue = entryNominalValue
+							newAxisValue.RangeMaxValue = entryRangeMaxValue
+							# print(f"- AxisValue {axisTag} ‘{entryName}’, Format {newAxisValue.Format}, AxisIndex {newAxisValue.AxisIndex}, ValueNameID {newAxisValue.ValueNameID}, Flags {newAxisValue.Flags}, RangeMinValue {newAxisValue.RangeMinValue}, NominalValue {newAxisValue.NominalValue}, RangeMaxValue {newAxisValue.RangeMaxValue}")
+
+						else:  # Format 1, DISCRETE SPOT
+							entryValue = float(entryValues.strip())
+							newAxisValue.Format = 1
+							newAxisValue.AxisIndex = axisIndex
+							newAxisValue.ValueNameID = entryValueNameID
+							newAxisValue.Flags = entryFlags
+							newAxisValue.Value = entryValue
+							# print(f"- AxisValue {axisTag} ‘{entryName}’, Format {newAxisValue.Format}, AxisIndex {newAxisValue.AxisIndex}, ValueNameID {newAxisValue.ValueNameID}, Flags {newAxisValue.Flags}, Value {newAxisValue.Value}")
+
+						newAxisValues.append(newAxisValue)
+
+			# print(f"\n✅ Overwriting STAT AxisValues with {len(newAxisValues)} entries...")
+			statTable.AxisValueArray.AxisValue = newAxisValues
+			font.save(fontpath, reorderTables=False)
+			# print(f"💾 Saved file: {fontFileName}")
+
+		if instance.customParameters[parameterName]:
+			parameterToSTAT(instance, font, fontPath, fontFileName)
+
+
+
 	def run(self, sender):
 		# check if the export folder exists
 		if not os.path.exists(self.exportPath):
@@ -436,7 +734,7 @@ class ExportToAllFormats():
 		folders = self.createFolders(familyNames, selectedFormats)
 
 		# export instances
-		self.exportInstances(fonts, selectedFormats, folders)
+		self.exportInstancesForFonts(fonts, selectedFormats, folders)
 
 		# post process WEB
 		self.runPostProcessWEB(selectedFormats, folders)
