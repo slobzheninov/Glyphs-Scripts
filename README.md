@@ -29,6 +29,7 @@ Options:
 * Export only the current or all open fonts
 Added an option to post-process (compress) exporteed otf/ttf to web formats, which is faster than exporting them from Glyphs. Needs FontTools.
 To stop exporting, delete or move the folder.
+
 Beta: exporting multiple “Static Settings”, which allow exporting different versions of the same instances, bulk-applying different custom parameters/names/properties:
 * Add an instance(s) with "Static Setting" in its name. Deactivate it.
 * Add custom parameters and/or change properties (such as the family name) of the "Static Setting" instance
