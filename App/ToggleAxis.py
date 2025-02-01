@@ -6,8 +6,6 @@ Toggles along masters across the 1st axis.
 from GlyphsApp import Glyphs, GSControlLayer, GSFontMaster
 from copy import copy
 
-font = Glyphs.font
-
 
 def getNextMaster(master, relatedLayers, AXIS):
 	for layer in relatedLayers:
@@ -19,7 +17,7 @@ def getNextMaster(master, relatedLayers, AXIS):
 def getRelatedMasters(selectedMaster, AXIS):
 	# find "related" layers along the axis
 	relatedMasters = []
-	for master in font.masters:
+	for master in selectedMaster.font.masters:
 		if master != selectedMaster:
 			related = True
 			for i, axis in enumerate(master.axes):
@@ -166,7 +164,7 @@ def getNextSpecialLayerName(specialLayer, AXIS):
 		return specialLayer.name
 
 
-def getNextMasterId(masterId, AXIS):
+def getNextMasterId(font, masterId, AXIS):
 	master = font.masters[masterId]
 	relatedMasters = getRelatedMasters(master, AXIS)
 	nextMaster = getNextMaster(master, relatedMasters, AXIS)
@@ -182,8 +180,8 @@ def toggleMasterInTab(master, tab, AXIS):
 	tempTabLayers = copy(tab.layers)
 
 	# get next master to the tab master
-	nextMasterId = getNextMasterId(master.id, AXIS)
-	nextMaster = font.masters[nextMasterId]
+	nextMasterId = getNextMasterId(master.font, master.id, AXIS)
+	nextMaster = master.font.masters[nextMasterId]
 
 	# cache next master and toggle tab master
 	cachedNextLayers[master.id] = nextMasterId
@@ -250,6 +248,7 @@ def setViewPortPosition(tab, viewPort, x, y):
 
 
 def toggleAxis(AXIS):
+	font = Glyphs.font
 	tab = font.currentTab
 	selectedMaster = font.selectedFontMaster
 
