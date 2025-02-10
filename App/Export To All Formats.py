@@ -5,8 +5,7 @@ __doc__ = """
 Export to all formats at once.
 WEB formats are WOFF and WOFF2. If “PS outlines” is off, TT outlines will be exported for the web formats.
 Compress OTF/TTF option converts exported OTF/TTF to web formats, which is faster than exporting them from Glyphs.
-Optionally, separates formats into subfolders.
-Instances with different familyNames go to different subfolders as well.
+Supports Static Settings, which is a way to bulk-apply custom parameters or properties, similar to variable instances. Just add deactivated instances with 'Static Setting' in their names and custom parameters.
 """
 
 Glyphs3 = Glyphs.versionNumber >= 3
@@ -58,7 +57,10 @@ alphaDeactivated = .4
 class CheckBoxWithAlpha(CheckBox):
 	def setAlpha(self, value=1):
 		self.getNSButton().setAlphaValue_(value)
-
+	def getAlpha(self):
+		return self.getNSButton().alphaValue
+	# def getValueCheckAlpha(self):
+	# 	return True if self.get() and self.getNSButton().alphaValue == alphaActive else False
 
 class ExportToAllFormats():
 	def __init__(self):
@@ -85,28 +87,28 @@ class ExportToAllFormats():
 			formatTitle = formats[i] if i != 4 else 'WEB'  # shorten 'VariableWEB' to another 'WEB'
 			y = lineYs[0]
 			titleID = 'title' + formats[i]
-			title = TextBox((x - columnWidth / 2, y, columnWidth * 2, M), formatTitle, alignment='center')
+			title = TextBox((x - columnWidth / 2, y, columnWidth * 2, M), formatTitle, alignment = 'center')
 			setattr(self.w, titleID, title)
 
 			x += columnWidth / 2 - 7
 			# export checkbox
 			y = lineYs[1]
 			exportCheckBoxID = 'exportCheckBox' + formats[i]
-			exportCheckBox = CheckBoxWithAlpha((x, y, columnWidth / 2, M), None, value=True, callback=self.checkBoxCallback)
+			exportCheckBox = CheckBoxWithAlpha((x, y, columnWidth / 2, M), None, value = True, callback = self.checkBoxCallback)
 			setattr(self.w, exportCheckBoxID, exportCheckBox)
 			setattr(getattr(self.w, exportCheckBoxID), 'i', i)
 
 			# autohint checkbox
 			y = lineYs[2]
 			autohintID = 'autohint' + formats[i]
-			autohint = CheckBoxWithAlpha((x, y, columnWidth / 2, M), '', value=True)
+			autohint = CheckBoxWithAlpha((x, y, columnWidth / 2, M), '', value = True)
 			setattr(self.w, autohintID, autohint)
 
 			# overlaps checkbox (except variable)
 			if i < 3:
 				y = lineYs[3]
 				overlapsID = 'overlaps' + formats[i]
-				overlaps = CheckBoxWithAlpha((x, y, columnWidth / 2, M), '', value=True)
+				overlaps = CheckBoxWithAlpha((x, y, columnWidth / 2, M), '', value = True)
 				setattr(self.w, overlapsID, overlaps)
 
 			# PS outlines (web only)
@@ -120,7 +122,7 @@ class ExportToAllFormats():
 			if i in [2, 4]:
 				y = lineYs[5]
 				postProcessID = 'postProcess' + formats[i]
-				postProcess = CheckBoxWithAlpha((x, y, columnWidth / 2, M), '', value=True, callback=self.checkBoxCallback)
+				postProcess = CheckBoxWithAlpha((x, y, columnWidth / 2, M), '', value = True, callback = self.checkBoxCallback)
 				postProcess.ID = formats[i]
 				setattr(self.w, postProcessID, postProcess)
 				# disable checkbox if fontTools import failed
@@ -130,24 +132,24 @@ class ExportToAllFormats():
 
 
 		# Export Path
-		self.w.exportPath = SquareButton((M + 3, lineYs[6], -M - 3, M), 'Export Path', callback=self.exportPathCallback)
+		self.w.exportPath = SquareButton((M + 3, lineYs[6], -M - 3, M), 'Export Path', callback = self.exportPathCallback)
 		if self.exportPath:
 			self.w.exportPath.setTitle(self.exportPath)
 
 		# Format Subfolders
-		self.w.subfolders = CheckBox((M+2, lineYs[7], W / 2, M), 'Format folders', value=True)
+		self.w.subfolders = CheckBox((M+2, lineYs[7], W / 2, M), 'Format folders', value = True)
 
 		# Family Subfolders
-		self.w.familySubfolders = CheckBox((145, lineYs[7], W / 2, M), 'Family folders', value=True)
+		self.w.familySubfolders = CheckBox((145, lineYs[7], W / 2, M), 'Family folders', value = True)
 
 		# Unnest components
-		self.w.unnestComponents = CheckBox((260, lineYs[7], W / 2, M), 'Unnest comps', value=True)
+		self.w.unnestComponents = CheckBox((260, lineYs[7], W / 2, M), 'Unnest comps', value = True)
 
 		# Export all open fonts
 		self.w.exportAll = CheckBox((M+2, lineYs[8], W / 2, M), 'All open fonts')
 
 		# Run button
-		self.w.run = Button((145, lineYs[8], -M, M), 'Export', callback=self.run)
+		self.w.run = Button((145, lineYs[8], -M, M), 'Export', callback = self.run)
 		if self.exportPath:
 			self.w.exportPath.setTitle(self.exportPath)
 
@@ -217,6 +219,7 @@ class ExportToAllFormats():
 		# deactivate run button if no formats are chosen for export		
 		self.w.run.enable(countFormats > 0)
 
+
 	def exportPathCallback(self, sender):
 		newExportPath = GetFolder(message='Export to', allowsMultipleSelection=False)
 		if newExportPath:
@@ -224,44 +227,78 @@ class ExportToAllFormats():
 		self.w.exportPath.setTitle(self.exportPath)
 		self.w.info.set('')
 
+
+	def getWebOutlines(self):
+		exportOTF, exportTTF, compressWEB, PSOutlines = self.w.exportCheckBoxOTF.get(), self.w.exportCheckBoxTTF.get(), self.w.postProcessWEB.get(), self.w.outlinesWEB.get()
+		if compressWEB:
+			if (exportOTF and exportTTF) or (not exportOTF and not exportTTF):
+				return OTF if PSOutlines else TTF
+			else:
+				return OTF if exportOTF else TTF
+		else:
+			return OTF if PSOutlines else TTF
+
+
+	def getFamilyNamesFromStaticSettings(self, font):
+		staticSettings, exportDefault = self.getStaticSettings(font)
+		familyNamesFromStaticSettings = set()
+		for staticSetting in staticSettings:
+			familyNamesFromStaticSettings.add(self.getFamilyNameForInstance(font.instances[staticSetting]))
+		return familyNamesFromStaticSettings, exportDefault
+
+
+	def applyStaticSettingToFamilyName(self, familyName, familyNamesFromStaticSettings, exportDefault):
+		familyNames = set([familyName]) if exportDefault else set()
+		for familyNameFromStaticSettings in familyNamesFromStaticSettings:
+			if '->' in familyNameFromStaticSettings:
+				old, new = familyNameFromStaticSettings.split('->')
+				familyNames.add(familyName.replace(old, new))
+			else:
+				familyNames.add(familyNameFromStaticSettings)
+		return familyNames
+
+
+	def getFontFamilyNames(self, font, selectedFormats):
+		familyNamesFromStaticSettings, exportDefault = self.getFamilyNamesFromStaticSettings(font)
+		exportVariable = 'Variable' in selectedFormats or 'VariableWEB' in selectedFormats
+		exportStatic = 'OTF' in selectedFormats or 'TTF' in selectedFormats or 'WEB' in selectedFormats
+
+		fontFamilyNames = {}
+		for instance in font.instances:
+			if instance.active:
+				familyName = self.getFamilyNameForInstance(instance)
+				
+				# variable instance - add familyName
+				if instance.type == INSTANCETYPEVARIABLE:
+					if exportVariable:
+						if familyName not in fontFamilyNames:
+							fontFamilyNames[familyName] = set()
+						fontFamilyNames[familyName].add('Variable')
+
+				# static instance - add familyNames for all 'Static Setting's
+				else:
+					if exportStatic:
+						for famName in self.applyStaticSettingToFamilyName(familyName, familyNamesFromStaticSettings, exportDefault):
+							if famName not in fontFamilyNames:
+								fontFamilyNames[famName] = set()
+							fontFamilyNames[famName].add('Static')
+
+		return fontFamilyNames
+
+
 	def getAllFamilyNames(self, fonts, selectedFormats):
 		familyNames = {}
 		for font in fonts:
-			fontFamilyNames = {}
-			for instance in font.instances:
-				if instance.active:
-					familyName = self.getFamilyNameForInstance(instance)
-					frmt = 'Static' if Glyphs3 is False or instance.type != INSTANCETYPEVARIABLE else 'Variable'
-					if familyName not in familyNames:
-						fontFamilyNames[familyName] = set()
-					fontFamilyNames[familyName].add(frmt)
-
-			# add static setting, which may modify familyNames
-			for instance in font.instances:
-				if 'Static Setting' in instance.name:
-					familyName = self.getFamilyNameForInstance(instance)
-					if '->' in familyName:
-						# replace all familyNames
-						for famName, formats in dict(fontFamilyNames).items():
-							if 'Static' in formats:
-								temp = familyName.split('->')
-								newFamilyName = famName.replace(temp[0], temp[1])
-								if newFamilyName not in fontFamilyNames:
-									fontFamilyNames[newFamilyName] = set()
-								fontFamilyNames[newFamilyName].add('Static')
-					else:
-						if familyName not in fontFamilyNames:
-							fontFamilyNames[familyName] = set()
-						fontFamilyNames[familyName].add('Static')
+			fontFamilyNames = self.getFontFamilyNames(font, selectedFormats)
 
 			# merge with the full dict
-			for familyName, values in fontFamilyNames.items():
+			for familyName, frmts in fontFamilyNames.items():
 				if familyName not in familyNames:
 					familyNames[familyName] = set()
-				for frmt in values:
+				for frmt in frmts:
 					familyNames[familyName].add(frmt)
-		
 		return familyNames
+
 
 	def createFolders(self, familyNames, selectedFormats):
 		folders = {}
@@ -353,6 +390,9 @@ class ExportToAllFormats():
 
 		# Copy the custom parameters from the instance
 		for i, instance in enumerate(font.instances):
+			# skip variable instances
+			if instance.type == INSTANCETYPEVARIABLE:
+				continue
 			# skip the source instance itself
 			if i == staticSettingIndex:
 				continue
@@ -361,10 +401,13 @@ class ExportToAllFormats():
 			for prop in sourceInstance.properties:
 				currentProp = instance.propertyForName_(prop.key)
 				newValue = None
-				if '->' in prop.value: # this will only replace if property found, skips otherwise (WIP: needs a better logic!)
+				if '->' in prop.value: # this will only replace if property found, skips otherwise except for familyName (WIP: needs a better logic!)
+					fromValue, toValue = prop.value.split('->')
 					if currentProp:
-						temp = prop.value.split('->')
-						newValue = str(currentProp.value).replace(temp[0], temp[1])
+						newValue = str(currentProp.value).replace(fromValue, toValue)
+						instance.setProperty_value_languageTag_(prop.key, newValue, None)
+					elif prop.key == 'familyNames':
+						newValue = str(font.familyName).replace(fromValue, toValue)
 						instance.setProperty_value_languageTag_(prop.key, newValue, None)
 				else:
 					newValue = prop.value
@@ -416,7 +459,8 @@ class ExportToAllFormats():
 			elif formt == 'TTF':
 				frmt = TTF
 			elif formt == 'WEB':
-				frmt = OTF if getattr(self.w, 'outlines' + formt).get() else TTF
+				# frmt = OTF if getattr(self.w, 'outlines' + formt).get() else TTF
+				frmt = self.getWebOutlines()
 			else: # 'Variable' or 'VariableWEB'
 				frmt = VARIABLE
 			
@@ -477,7 +521,7 @@ class ExportToAllFormats():
 					result = instance.generate(Format=frmt, FontPath=exportPath, Containers=containers, RemoveOverlap=removeOverlap, AutoHint=autohint)
 				if result is not True:
 					Glyphs.showMacroWindow()
-					print(result)
+					print(result, font, instance, frmt)
 				
 				if instance.type == INSTANCETYPEVARIABLE:
 					# add ttLib table
@@ -522,7 +566,6 @@ class ExportToAllFormats():
 				self.doUnnestNestedComponents(font)
 			else:
 				font = originalFont
-
 
 			# get static settings
 			staticSettings, exportDefault = self.getStaticSettings(font)
@@ -578,18 +621,20 @@ class ExportToAllFormats():
 			for formt in selectedFormats:
 				if self.postProcessWEB and formt == 'WEB':
 					for familyName, formatSubfolders in folders.items():
-						PSOutlines = getattr(self.w, 'outlines' + formt).get()
-						sourceFormats =  ['.otf'] if PSOutlines else ['.ttf']
-						sourcePath = formatSubfolders['OTF' if PSOutlines else 'TTF'] 
-						exportPath = formatSubfolders['WEB']
-						self.compressFontsInFolder(sourcePath, exportPath, sourceFormats)
+						if formt in formatSubfolders:
+							PSOutlines = self.getWebOutlines() == OTF
+							self.compressFontsInFolder(
+								sourcePath = formatSubfolders['OTF' if PSOutlines else 'TTF'],
+								exportPath = formatSubfolders['WEB'],
+								sourceFormats = ['.otf'] if PSOutlines else ['.ttf'])
 
 				elif self.postProcessVariableWEB and formt == 'VariableWEB':
 					for familyName, formatSubfolders in folders.items():
-						sourceFormats = ['.ttf']
-						sourcePath = formatSubfolders['Variable']
-						exportPath = formatSubfolders['VariableWEB']
-						self.compressFontsInFolder(sourcePath, exportPath, sourceFormats)
+						if formt in formatSubfolders:
+							self.compressFontsInFolder(
+								sourcePath = formatSubfolders['Variable'],
+								exportPath = formatSubfolders['VariableWEB'], 
+								sourceFormats = ['.ttf'])
 
 
 	def addSTAT(self, instance, fontPath, fontFileName):
@@ -744,7 +789,5 @@ class ExportToAllFormats():
 		
 		# activate the run button back
 		self.w.run.enable(1)
-
-		return
 
 ExportToAllFormats()
