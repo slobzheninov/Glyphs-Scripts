@@ -117,7 +117,7 @@ def italicize(thisPoint, italicAngle=0.0, pivotalY=0.0):  # don't change x to y 
 	tangens = tan(italicAngle)  # math.tan needs radians
 	horizontalDeviance = tangens * yOffset  # vertical distance from pivotal point
 	x += horizontalDeviance  # x of point that is yOffset from pivotal point
-	return NSPoint(int(x), thisPoint.y)
+	return NSPoint(round(x), thisPoint.y)
 
 
 # ----------------------------------------
