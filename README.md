@@ -68,7 +68,7 @@ Harmonizes any selected on-curve points. Algorithm found at @simoncozens. Now th
 ## Dangerous Offcurves
 Checks if there are any off-curve points (handles) dangerously close to their curve segment (that may cause problems with conversion to True Type bezier for variable fonts). Opens problematic layers in a new tab. Default threshold value is 0.05 units.
 
-## Point Counter
+## Point Counter — depricated; use Report Compatibility for a more detailed report.
 Shows how many points are there in each layer of the current glyph. Useful for fixing interpolation.
 
 ## Kern to max
