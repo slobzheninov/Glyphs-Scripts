@@ -25,7 +25,7 @@ def count_layer_elements(layer):
 		'corner components': len([hint for hint in layer.hints if hint.type == CORNER]),
 		'cap components': len([hint for hint in layer.hints if hint.type == CAP]),
 		'anchors': len(layer.anchors),
-		'incompatiblity': 0,
+		'name': layer.name,
 	}
 
 
@@ -50,70 +50,59 @@ def get_elements_per_layer(glyph):
 	no_overlaps_elements = {}
 	for layer in glyph.layers:
 		elements[layer.layerId] = count_layer_elements(layer)
-		elements[layer.layerId]['name'] = layer.name
+	return remove_unused_elements(elements)
+
+
+def get_compatibility_groups(glyph):
+	groups = {}
+	for layer in glyph.layers:
+		if layer.compareString() not in groups:
+			groups[layer.compareString()] = []
+		groups[layer.compareString()].append(layer)
+	sorted_groups = dict(sorted(groups.items(), key=lambda item: len(item[1]), reverse=True))
+	return sorted_groups
+
+def get_group_colors(glyph, groups):
+	COLORS = ['🟢🟡🟠🔴', '🟩🟨🟧🟥', '💚💛🧡❤️'] # ['🟢🟡🟠🔴🟣🔵⚫', '🟩🟨🟧🟥🟪🟦⬛', '💚💛🧡❤️💜💙🖤']
+	group_colors = {}
+
+	tier = -1
+	max_tier = len(glyph.layers) - 1
+	last_tier = None
+	last_layer_count = None
+	style = 0
+
+	for compareString, layers in groups.items():
+		current_layer_count = len(layers)
+
+		if current_layer_count != last_layer_count:
+			last_layer_count = current_layer_count
+			tier = min(tier + 1, max_tier)
 		
-		flattened_layer = layer.copy()
-		flattened_layer.flattenOutlinesRemoveOverlap_origHints_secondaryPath_extraHandles_error_(False, None, None, None, None)
-		flattened_elements[layer.layerId] = count_layer_elements(flattened_layer)
-		flattened_elements[layer.layerId]['name'] = layer.name
+		if tier == last_tier:
+			style += 1
+			style = style % len(COLORS)
+		else:
+			style = 0
 
-		no_overlaps_layer = layer.copy()
-		no_overlaps_layer.flattenOutlinesRemoveOverlap_origHints_secondaryPath_extraHandles_error_(True, None, None, None, None)
-		no_overlaps_elements[layer.layerId] = count_layer_elements(no_overlaps_layer)
-		no_overlaps_elements[layer.layerId]['name'] = layer.name
-	return remove_unused_elements(elements), remove_unused_elements(flattened_elements), remove_unused_elements(no_overlaps_elements)
+		last_tier = tier
 
+		group_colors[compareString] = COLORS[style][tier]
 
-def get_layers_per_element(elements):
-	layers_per_element = {}
-	for layerId, layer_elements in elements.items():
-		for element, count in layer_elements.items():
-			if element not in layers_per_element:
-				layers_per_element[element] = {}
-			if count not in layers_per_element[element]:
-				layers_per_element[element][count] = []
-			layers_per_element[element][count].append(layerId)
-	return layers_per_element
+	return group_colors
+		
 
-
-def get_imcompatibility_points(elements, layers_per_element):
-	for element, count_dict in layers_per_element.items():
-		if element == 'name':
-			continue
-		if len(count_dict) > 1:
-			count_dict_sorted = sorted(count_dict.items(), key=lambda x: len(x[1]), reverse=True)
-
-			# count main groups (groups with largest number of matches)
-			main_groups_count = 0
-			main_group_size = len(count_dict_sorted[0][1])
-			for i in range(len(count_dict_sorted)):
-				if len(count_dict_sorted[i][1]) == main_group_size:
-					main_groups_count += 1
-				else:
-					break
-			# add incompatiblity points to all groups whose element count differs from the main group
-			for count, layerIds in count_dict_sorted[main_groups_count:]:
-				for layerId in layerIds:
-					elements[layerId]['incompatiblity'] += 1
-
-
-def print_report(elements, glyph_name, level = 0, note = ''):
+def print_report(glyph, elements, group_colors, level = 0, note = ''):
 	indent = '   ' * level
-	
+
 	if note:
 		print(f'{indent}{note}\n')
 	else:
-		print(f'{indent}--------------------  {glyph_name}  --------------------\n')
+		print(f'{indent}--------------------  {glyph.name}  --------------------\n')
 	
 	for layerId, e in elements.items():
-		if e['incompatiblity'] == 0:
-			s = f'{indent}🟢 '
-		elif e['incompatiblity'] < 3:
-			s = f'{indent}🟡 '
-		elif e['incompatiblity'] < 5:
-			s = f'{indent}🟠 '
-		else:
-			s = f'{indent}🔴 '
+
+		s = f"{indent}{group_colors[glyph.layers[layerId].compareString()]} " 
 
 		for element in ELEMENTS:
 			if element in e:
@@ -128,28 +117,34 @@ def print_report(elements, glyph_name, level = 0, note = ''):
 	print('')
 
 
-	
-def report_glyph_compatibility(glyph):
-	elements, flattened_elements, no_overlaps_elements = get_elements_per_layer(glyph)
-
-	layers_per_element = get_layers_per_element(elements)
-	get_imcompatibility_points(elements, layers_per_element)
-
-	flattened_layers_per_element = get_layers_per_element(flattened_elements)
-	get_imcompatibility_points(flattened_elements, flattened_layers_per_element)
-
-	no_overlaps_layers_per_element = get_layers_per_element(no_overlaps_elements)
-	get_imcompatibility_points(no_overlaps_elements, no_overlaps_layers_per_element)
-
-	print('* * *   Compatibility Report   * * *\n')
-	print_report(elements, glyph.name)
-	print_report(flattened_elements, glyph.name, level = 1, note = 'Flatten Outlines (variable export). Flattens masks, corner and cap components, sometimes regular components')
-	print_report(no_overlaps_elements, glyph.name, level = 2, note = 'Flatten Outlines + Remove Overlaps (variable export with a “RemoveOverlap” filter)')
-	print('\n')
-
+def report_glyph_compatibility(glyph, level = 0, note = ''):
+	elements = get_elements_per_layer(glyph)
+	groups = get_compatibility_groups(glyph)
+	group_colors = get_group_colors(glyph, groups)
+	print_report(glyph, elements, group_colors, level, note)
 	
 
 for layer in set(Glyphs.font.selectedLayers):
-	report_glyph_compatibility(layer.parent)
+	glyph = layer.parent
+	report_glyph_compatibility(glyph, level = 0)
+
+	# flatten outlines
+	flatten_glyph = GSGlyph()
+	for i, l in enumerate(glyph.layers):
+		flatten_layer = l.copy()
+		flatten_layer.name = l.name
+		flatten_layer.flattenOutlinesRemoveOverlap_origHints_secondaryPath_extraHandles_error_(False, None, None, None, None)
+		flatten_glyph.layers.append(flatten_layer)
+	report_glyph_compatibility(flatten_glyph, level = 1, note = 'Flatten Outlines (variable export). Flattens masks, corner and cap components, sometimes regular components')
+
+	# flatten outlines
+	remove_overlaps_glyph = GSGlyph()
+	for i, l in enumerate(glyph.layers):
+		remove_overlaps_layer = l.copy()
+		remove_overlaps_layer.name = l.name
+		remove_overlaps_layer.flattenOutlinesRemoveOverlap_origHints_secondaryPath_extraHandles_error_(True, None, None, None, None)
+		remove_overlaps_glyph.layers.append(remove_overlaps_layer)
+	report_glyph_compatibility(remove_overlaps_glyph, level = 2, note = 'Flatten Outlines + Remove Overlaps (variable export with a “RemoveOverlap” filter)')
+
 
 
