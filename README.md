@@ -111,6 +111,10 @@ Example: to kern AV the same as VA, type AVVA, place the cursor between AV, and 
 ## Set Vertical Metrics
 A manager for the vertical metrics based on Google’s [strategy](https://github.com/googlefonts/gf-docs/blob/main/VerticalMetrics/README.md).
 
+
+## Report Compatibility
+Prints the structure of elements for the selected glyphs. Separately shows compatibility after flattening outlines (as in variable export), and flattening outlines + removing overlaps (as in variable export with a “RemoveOverlap” filter).
+
 ### License
 Copyright 2020 Alex Slobzheninov.
 
