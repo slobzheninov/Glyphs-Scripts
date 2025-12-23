@@ -53,15 +53,12 @@ def setMasterLayersToMaster(tab, newMaster, currentMaster=None):
 	# get user's selection to reset later
 	currentTextCursor = tab.textCursor
 	currentTextRange = tab.textRange
-	newMasterIndex = font.masters.index(newMaster)
+	newMasterIndex = newMaster.font.masters.index(newMaster)
 	if currentMaster is None:
 		currentMaster = newMaster
 	# toggle master to some other master and back, otherwise it doesn't apply
 	if newMaster == currentMaster:
-		if 0 < newMasterIndex:
-			toggle = -1
-		else:
-			toggle = 1
+		toggle = -1 if 0 < newMasterIndex else 1
 	else:
 		toggle = 0
 
@@ -75,12 +72,12 @@ def setMasterLayersToMaster(tab, newMaster, currentMaster=None):
 			textRange += 1
 		else:
 			if textCursor is not None:
-				setMaster(font, tab, textCursor, textRange, toggle, newMasterIndex)
+				setMaster(newMaster.font, tab, textCursor, textRange, toggle, newMasterIndex)
 			# reset selection
 			textCursor = None
 			textRange = 0
 	if textCursor is not None:
-		setMaster(font, tab, textCursor, textRange, toggle, newMasterIndex)
+		setMaster(newMaster.font, tab, textCursor, textRange, toggle, newMasterIndex)
 
 	# set original user's selection
 	tab.textCursor = currentTextCursor
@@ -207,7 +204,7 @@ def toggleMasterInTab(master, tab, AXIS):
 			# get next layer (either from cache or do cache it)
 			nextLayerId = cachedNextLayers.get(layer.layerId)
 			if nextLayerId is None:
-				nextLayerId = getNextMasterId(layer.layerId, AXIS)
+				nextLayerId = getNextMasterId(master.font, layer.layerId, AXIS)
 				cachedNextLayers[layer.layerId] = nextLayerId
 			nextLayer = layer.parent.layers[nextLayerId]
 			tempTabLayers[i] = nextLayer
@@ -235,18 +232,6 @@ def toggleMasterInTab(master, tab, AXIS):
 		setMasterLayersToMaster(tab, nextMaster)
 
 
-def getViewPortPosition(viewPort):
-	viewPortX = viewPort.origin.x
-	viewPortY = viewPort.origin.y
-	return viewPortX, viewPortY
-
-
-def setViewPortPosition(tab, viewPort, x, y):
-	viewPort.origin.x = x
-	viewPort.origin.y = y
-	tab.viewPort = viewPort
-
-
 def toggleAxis(AXIS):
 	font = Glyphs.font
 	tab = font.currentTab
@@ -261,11 +246,10 @@ def toggleAxis(AXIS):
 
 	else:
 		# get viewport position
-		viewPort = tab.viewPort
-		viewPortX, viewPortY = getViewPortPosition(viewPort)
+		viewPortX, viewPortY = tab.viewPort.origin.x, tab.viewPort.origin.y
 
 		# toggle layers and masters
 		toggleMasterInTab(selectedMaster, tab, AXIS)
 
 		# restore viewport position
-		setViewPortPosition(tab, viewPort, viewPortX, viewPortY)
+		tab.viewPort.origin.x, tab.viewPort.origin.y = viewPortX, viewPortY
