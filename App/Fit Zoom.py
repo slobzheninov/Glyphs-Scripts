@@ -6,7 +6,6 @@ Fit the selected layer in the current tab on the screen. With Text tool on, fit 
 """
 
 if Font and Font.currentTab and Layer:
-	Glyphs.clearLog()
 	font = Font
 	textTool = Glyphs.currentDocument.windowController().toolDrawDelegate().className() in ['GlyphsToolText', 'GlyphsToolHand']
 	
