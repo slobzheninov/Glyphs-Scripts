@@ -246,10 +246,10 @@ def toggleAxis(AXIS):
 
 	else:
 		# get viewport position
-		viewPortX, viewPortY = tab.viewPort.origin.x, tab.viewPort.origin.y
+		viewPort = tab.viewPort
 
 		# toggle layers and masters
 		toggleMasterInTab(selectedMaster, tab, AXIS)
 
 		# restore viewport position
-		tab.viewPort.origin.x, tab.viewPort.origin.y = viewPortX, viewPortY
+		tab.viewPort = viewPort
