@@ -8,6 +8,7 @@ import traceback
 
 __doc__="""
 Set vertical metrics.
+Needs Agrave for calculating TYPO metrics. Needs implementation: using Abreveacute for stacked diacritics.
 """
 
 # NOTES
@@ -53,7 +54,7 @@ class SetVerticalMetrics():
 			return
 
 		self.selected_masters = []
-		self.all_highest, self.all_lowest = [], []
+		self.all_tallest, self.all_lowest = [], []
 		self.ignore_non_exporting_glyphs = True
 		self.round = 10 # round all metric values to multiple of this
 
@@ -142,7 +143,7 @@ class SetVerticalMetrics():
 		self.w.masters = List((M, y, -M, -M*5),
 				[{'Masters': master.name} for master in self.font.masters],
 				columnDescriptions = [{'title': 'Masters', 'editable': False},
-									{'title': 'Highest', 'editable': False},
+									{'title': 'Tallest', 'editable': False},
 									{'title': 'Lowest', 'editable': False}],
 				doubleClickCallback = self.list_double_click,
 				allowsSorting = False,
@@ -169,12 +170,12 @@ class SetVerticalMetrics():
 		for i in sender.getSelection():
 			try:
 				value = sender.get()[i]
-				highest_glyph = self.font.glyphs[value['Highest'].split()[1]]
-				highest_layer = highest_glyph.layers[self.font.masters[i].id]
+				tallest_glyph = self.font.glyphs[value['Tallest'].split()[1]]
+				tallest_layer = tallest_glyph.layers[self.font.masters[i].id]
 
 				lowest_glyph = self.font.glyphs[value['Lowest'].split()[1]]
 				lowest_layer = lowest_glyph.layers[self.font.masters[i].id]
-				new_layers.extend([highest_layer, lowest_layer])
+				new_layers.extend([tallest_layer, lowest_layer])
 			except:
 				print(traceback.format_exc())
 		if new_layers:
@@ -279,42 +280,43 @@ class SetVerticalMetrics():
 		if self.do_redraw and self.font and self.font.selectedLayers:
 			self.draw_background(self.font.selectedLayers[0])
 
-	def get_highest_and_lowest(self, font):
-		all_highest, all_lowest = [], []
+	def get_tallest_and_lowest(self, font):
+		all_tallest, all_lowest = [], []
 		for i, master in enumerate(font.masters):
 			masterID = master.id
 			glyphs_bottoms_and_tops = []
 			for glyph in font.glyphs:
 				if glyph.export or not self.ignore_non_exporting_glyphs:
 					glyphs_bottoms_and_tops.append([glyph.name, glyph.layers[masterID].bounds.origin.y, glyph.layers[masterID].bounds.origin.y + glyph.layers[masterID].bounds.size.height])
-			highest = sorted(glyphs_bottoms_and_tops, key=lambda x: -x[2])[0]	# ['Aring', 0.0, 899.0]
+			tallest = sorted(glyphs_bottoms_and_tops, key=lambda x: -x[2])[0]	# ['Aring', 0.0, 899.0]
 			lowest = sorted(glyphs_bottoms_and_tops, key=lambda x: x[1])[0] 	# ['at', -249.0, 749.0]
-			highest = nicely_round(highest[2]), highest[0]
+			tallest = nicely_round(tallest[2]), tallest[0]
 			lowest = nicely_round(lowest[1]), lowest[0]
-			all_highest.append(highest)
+			all_tallest.append(tallest)
 			all_lowest.append(lowest)
 
 			# set to UI
-			self.w.masters[i] = {'Highest': str(highest[0]) + '  ' + highest[1],
+			self.w.masters[i] = {'Tallest': str(tallest[0]) + '  ' + tallest[1],
 								'Lowest': str(lowest[0]) + '  ' + lowest[1]}
-		return all_highest, all_lowest
+		return all_tallest, all_lowest
 
-	def get_highest_and_lowest_for_masters(self, indexes):
-		selected_highest, selected_lowest = [], []
+	def get_tallest_and_lowest_for_masters(self, indexes):
+		selected_tallest, selected_lowest = [], []
 		for i in indexes:
-			selected_highest.append(self.all_highest[i])
+			selected_tallest.append(self.all_tallest[i])
 			selected_lowest.append(self.all_lowest[i])
-		sel_highest = sorted(selected_highest, key=lambda x: -x[0])[0]
+		sel_tallest = sorted(selected_tallest, key=lambda x: -x[0])[0]
 		sel_lowest = sorted(selected_lowest, key=lambda x: x[0])[0]
-		return sel_highest, sel_lowest
+		return sel_tallest, sel_lowest
 
-	def get_highest_Aacute(self, font, indexes):
-		if 'Aacute' not in font.glyphs:
+	def get_tallest_Agrave(self, font, indexes):
+		if 'Agrave' not in font.glyphs:
+			print('Missing Agrave for TYPO metrics.')
 			return None, None
-		glyph = font.glyphs['Aacute']
+		glyph = font.glyphs['Agrave']
 		tops = [[glyph.layers[font.masters[i].id].bounds.origin.y + glyph.layers[font.masters[i].id].bounds.size.height, i] for i in indexes]
-		highest = sorted(tops, key=lambda x: -x[0])[0]
-		return highest # this is [y, i]
+		tallest = sorted(tops, key=lambda x: -x[0])[0]
+		return tallest # returns [y, i]
 
 	def calc(self, sender = None):
 		if not self.font:
@@ -330,15 +332,15 @@ class SetVerticalMetrics():
 		self.w.masters.set([{'Masters': master.name} for master in self.font.masters])
 		self.w.masters.setSelection(current_selection if current_selection else [i for i in range(len(self.font.masters))]) # set last selection or all by default
 
-		self.all_highest, self.all_lowest = self.get_highest_and_lowest(self.font)
+		self.all_tallest, self.all_lowest = self.get_tallest_and_lowest(self.font)
 		selected_masters_indexes = self.w.masters.getSelection()
 
-		# get lowest and highest for the selection
-		sel_highest, sel_lowest = self.get_highest_and_lowest_for_masters(selected_masters_indexes)
+		# get lowest and tallest for the selection
+		sel_tallest, sel_lowest = self.get_tallest_and_lowest_for_masters(selected_masters_indexes)
 
 		# ----- set WIN
-		# simply set to lowest and highest glyphs
-		self.w.win_ascender.set(round_up_to_multiple(sel_highest[0], self.round))
+		# simply set to lowest and tallest glyphs
+		self.w.win_ascender.set(round_up_to_multiple(sel_tallest[0], self.round))
 		self.w.win_descender.set(round_up_to_multiple(abs(sel_lowest[0]), self.round)) # absolute
 		
 		# ----- set TYPO
@@ -357,12 +359,13 @@ class SetVerticalMetrics():
 			line_height = None
 
 
-		# use Aacute (WIP: needs a fallback alternative)
+		# use Agrave (WIP: needs a fallback alternative)
 		ascender, descender = None, None
-		highest_Aacute, master_index = self.get_highest_Aacute(self.font, selected_masters_indexes)
-		if highest_Aacute:
+		tallest_Agrave, master_index = self.get_tallest_Agrave(self.font, selected_masters_indexes) # WIP: Google: “Agrave is a required minimum, and Abreveacute is a strongly recommended minimum.”
+
+		if tallest_Agrave:
 			master = self.font.masters[master_index]
-			minimal_ascender = round_up_to_multiple(highest_Aacute, self.round)
+			minimal_ascender = round_up_to_multiple(tallest_Agrave, self.round)
 			center = remap(self.w.centering.get(), 0, 1, master.xHeight/2, master.capHeight/2)
 			dist = minimal_ascender - center
 			minimal_descender = center - dist
@@ -371,7 +374,7 @@ class SetVerticalMetrics():
 			current_line_height_abs = minimal_ascender - minimal_descender
 			current_line_height = round(current_line_height_abs / self.font.upm, 2)
 
-			# no line_height input, use Aacute
+			# no line_height input, use Agrave
 			if line_height is None:
 				self.w.line_height.set(str(current_line_height))
 
@@ -385,10 +388,10 @@ class SetVerticalMetrics():
 				ascender = round_up_to_multiple(minimal_ascender + diff/2, self.round)
 				descender = -round_up_to_multiple(abs(minimal_descender - diff/2), self.round)
 
-				# if shorter than Aacute, notify
+				# if shorter than Agrave, notify
 				if current_line_height > line_height:
 					Glyphs.showMacroWindow()
-					print('Line height measured by Aacute is ', current_line_height, ', your input is shorter: ', line_height)
+					print('Line height measured by Agrave is ', current_line_height, ', your input is shorter: ', line_height)
 
 		self.w.typo_ascender.set(ascender)
 		self.w.typo_descender.set(descender)
@@ -464,8 +467,5 @@ class SetVerticalMetrics():
 		# set custom parameter (use in Glyphs)
 		if self.w.use_in_Glyphs.get():
 			self.font.customParameters['EditView Line Height'] = self.typo_metrics[0] - self.typo_metrics[1] + self.typo_metrics[2]
-
-
-
 
 SetVerticalMetrics()
