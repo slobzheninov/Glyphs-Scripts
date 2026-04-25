@@ -4,7 +4,7 @@ from __future__ import division, print_function, unicode_literals
 from vanilla import FloatingWindow, List, TextBox, EditText, Button, CheckBox, Slider
 from AppKit import NSApp, NSBezierPath, NSRect, NSColor
 import math
-import traceback # print(traceback.format_exc())
+import traceback
 
 __doc__="""
 Set vertical metrics.
@@ -65,6 +65,7 @@ class SetVerticalMetrics():
 		self.colors =  [(1, 0, 0, 1), # win = red
 						(0, 0, 1, .1), # typo = blue
 						(0, 1, 0, .1)] # hhea = green
+		self.do_redraw = True
 		
 		W, H = 400, 500
 		M = 10
@@ -195,13 +196,15 @@ class SetVerticalMetrics():
 	def remove_callbacks(self, sender):
 		Glyphs.removeCallback(self.draw_background, DRAWBACKGROUND)
 
-	def draw_background(self, current_layer, event):
+	def draw_background(self, current_layer, event = None):
+		if not self.font or not self.font.currentTab:
+			return
 		if not self.show_metrics:
+			self.font.currentTab.redraw()
 			return
 
 		for i in self.show_metrics:
-			metric = [self.win_metrics, self.typo_metrics, self.hhea_metrics][i]
-			
+			metric = [self.win_metrics, self.typo_metrics, self.hhea_metrics][i]			
 			if None in metric[:1]:
 				continue
 
@@ -211,6 +214,7 @@ class SetVerticalMetrics():
 						h = metric[0] - metric[1] if i != 0 else metric[0] + metric[1],
 						color = self.colors[i],
 						stroke = None if i != 0 else 5) # stroke for win, and fill for typo and hhea
+		self.font.currentTab.redraw()
 
 	def rect(self, x, y, w, h, color, stroke = None):
 		# make path
@@ -225,6 +229,7 @@ class SetVerticalMetrics():
 		else: # fill
 			bezierPath.fill()
 
+
 	def show_callback(self, sender):
 		if sender.get():
 			if sender.ID not in self.show_metrics:
@@ -233,10 +238,14 @@ class SetVerticalMetrics():
 			if sender.ID in self.show_metrics:
 				self.show_metrics.remove(sender.ID)
 
+		if self.font and self.font.selectedLayers:
+			self.draw_background(self.font.selectedLayers[0])
+
 	def metrics_callback(self, sender = None):
 		# if no sender, call this callback for all the buttons
 		if sender is None:
 			for edittext in [self.w.win_ascender, self.w.win_descender, self.w.typo_ascender, self.w.typo_descender, self.w.typo_linegap, self.w.hhea_ascender, self.w.hhea_descender, self.w.hhea_linegap]:
+				self.do_redraw = edittext is self.w.hhea_linegap
 				self.metrics_callback(edittext)
 			return
 
@@ -266,6 +275,9 @@ class SetVerticalMetrics():
 				sender.set(self.hhea_metrics[i])
 			else:
 				self.hhea_metrics[i] = value
+
+		if self.do_redraw and self.font and self.font.selectedLayers:
+			self.draw_background(self.font.selectedLayers[0])
 
 	def get_highest_and_lowest(self, font):
 		all_highest, all_lowest = [], []
@@ -346,6 +358,7 @@ class SetVerticalMetrics():
 
 
 		# use Aacute (WIP: needs a fallback alternative)
+		ascender, descender = None, None
 		highest_Aacute, master_index = self.get_highest_Aacute(self.font, selected_masters_indexes)
 		if highest_Aacute:
 			master = self.font.masters[master_index]
